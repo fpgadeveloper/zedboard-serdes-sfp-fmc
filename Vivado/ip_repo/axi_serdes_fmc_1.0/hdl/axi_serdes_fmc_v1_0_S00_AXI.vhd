@@ -17,7 +17,7 @@ entity axi_serdes_fmc_v1_0_S00_AXI is
 	);
 	port (
 		-- Users to add ports here
-
+    
 		-- User ports ends
 		-- Do not modify the ports beyond this line
 

@@ -15,6 +15,8 @@ entity axi_serdes_fmc_v1_0_S00_AXIS is
 	);
 	port (
 		-- Users to add ports here
+    txclk_i        : in std_logic;
+    txdata_o       : out std_logic_vector(9 downto 0);
 
 		-- User ports ends
 		-- Do not modify the ports beyond this line
@@ -37,142 +39,47 @@ entity axi_serdes_fmc_v1_0_S00_AXIS is
 end axi_serdes_fmc_v1_0_S00_AXIS;
 
 architecture arch_imp of axi_serdes_fmc_v1_0_S00_AXIS is
-	-- function called clogb2 that returns an integer which has the 
-	-- value of the ceiling of the log base 2.
-	function clogb2 (bit_depth : integer) return integer is 
-	variable depth  : integer := bit_depth;
-	  begin
-	    if (depth = 0) then
-	      return(0);
-	    else
-	      for clogb2 in 1 to bit_depth loop  -- Works for up to 32 bit integers
-	        if(depth <= 1) then 
-	          return(clogb2);      
-	        else
-	          depth := depth / 2;
-	        end if;
-	      end loop;
-	    end if;
-	end;    
 
-	-- Total number of input data.
-	constant NUMBER_OF_INPUT_WORDS  : integer := 8;
-	-- bit_num gives the minimum number of bits needed to address 'NUMBER_OF_INPUT_WORDS' size of FIFO.
-	constant bit_num  : integer := clogb2(NUMBER_OF_INPUT_WORDS-1);
-	-- Define the states of state machine
-	-- The control state machine oversees the writing of input streaming data to the FIFO,
-	-- and outputs the streaming data from the FIFO
-	type state is ( IDLE,        -- This is the initial/idle state 
-	                WRITE_FIFO); -- In this state FIFO is written with the
-	                             -- input stream data S_AXIS_TDATA 
-	signal axis_tready	: std_logic;
-	-- State variable
-	signal  mst_exec_state : state;  
-	-- FIFO implementation signals
-	signal  byte_index : integer;    
-	-- FIFO write enable
-	signal fifo_wren : std_logic;
-	-- FIFO full flag
-	signal fifo_full_flag : std_logic;
-	-- FIFO write pointer
-	signal write_pointer : integer range 0 to bit_num-1 ;
-	-- sink has accepted all the streaming data and stored in FIFO
-	signal writes_done : std_logic;
+  -- FIFO to convert the 32bit AXI streaming interface to an 8-bit interface
+  component fifo_32bit_to_8bit
+    port (
+      rst : in std_logic;
+      wr_clk : in std_logic;
+      rd_clk : in std_logic;
+      din : in std_logic_vector(31 downto 0);
+      wr_en : in std_logic;
+      rd_en : in std_logic;
+      dout : out std_logic_vector(7 downto 0);
+      full : out std_logic;
+      empty : out std_logic;
+      valid : out std_logic
+    );
+  end component;
 
-	type BYTE_FIFO_TYPE is array (0 to (NUMBER_OF_INPUT_WORDS-1)) of std_logic_vector(((C_S_AXIS_TDATA_WIDTH/4)-1)downto 0);
+  signal rst     : std_logic;
+  signal valid_n : std_logic;
+  
 begin
-	-- I/O Connections assignments
+  -- Invert the AXI reset signal
+  rst <= not S_AXIS_ARESETN;
+  
+  fifo_32bit_to_8bit_inst : fifo_32bit_to_8bit
+  port map (
+    rst    => rst,
+    wr_clk => S_AXIS_ACLK, -- AXIS clock = global clock / 4
+    rd_clk => txclk_i,     -- Global clock
+    din    => S_AXIS_TDATA,
+    wr_en  => S_AXIS_TVALID,
+    rd_en  => '1',  -- Always read from FIFO
+    dout   => txdata_o(7 downto 0),
+    full   => open,
+    empty  => open,
+    valid  => valid_n
+  );
 
-	S_AXIS_TREADY	<= axis_tready;
-	-- Control state machine implementation
-	process(S_AXIS_ACLK)
-	begin
-	  if (rising_edge (S_AXIS_ACLK)) then
-	    if(S_AXIS_ARESETN = '0') then
-	      -- Synchronous reset (active low)
-	      mst_exec_state      <= IDLE;
-	    else
-	      case (mst_exec_state) is
-	        when IDLE     => 
-	          -- The sink starts accepting tdata when 
-	          -- there tvalid is asserted to mark the
-	          -- presence of valid streaming data 
-	          if (S_AXIS_TVALID = '1')then
-	            mst_exec_state <= WRITE_FIFO;
-	          else
-	            mst_exec_state <= IDLE;
-	          end if;
-	      
-	        when WRITE_FIFO => 
-	          -- When the sink has accepted all the streaming input data,
-	          -- the interface swiches functionality to a streaming master
-	          if (writes_done = '1') then
-	            mst_exec_state <= IDLE;
-	          else
-	            -- The sink accepts and stores tdata 
-	            -- into FIFO
-	            mst_exec_state <= WRITE_FIFO;
-	          end if;
-	        
-	        when others    => 
-	          mst_exec_state <= IDLE;
-	        
-	      end case;
-	    end if;  
-	  end if;
-	end process;
-	-- AXI Streaming Sink 
-	-- 
-	-- The example design sink is always ready to accept the S_AXIS_TDATA  until
-	-- the FIFO is not filled with NUMBER_OF_INPUT_WORDS number of input words.
-	axis_tready <= '1' when ((mst_exec_state = WRITE_FIFO) and (write_pointer <= NUMBER_OF_INPUT_WORDS-1)) else '0';
-
-	process(S_AXIS_ACLK)
-	begin
-	  if (rising_edge (S_AXIS_ACLK)) then
-	    if(S_AXIS_ARESETN = '0') then
-	      write_pointer <= 0;
-	      writes_done <= '0';
-	    else
-	      if (write_pointer <= NUMBER_OF_INPUT_WORDS-1) then
-	        if (fifo_wren = '1') then
-	          -- write pointer is incremented after every write to the FIFO
-	          -- when FIFO write signal is enabled.
-	          write_pointer <= write_pointer + 1;
-	          writes_done <= '0';
-	        end if;
-	        if ((write_pointer = NUMBER_OF_INPUT_WORDS-1) or S_AXIS_TLAST = '1') then
-	          -- reads_done is asserted when NUMBER_OF_INPUT_WORDS numbers of streaming data 
-	          -- has been written to the FIFO which is also marked by S_AXIS_TLAST(kept for optional usage).
-	          writes_done <= '1';
-	        end if;
-	      end  if;
-	    end if;
-	  end if;
-	end process;
-
-	-- FIFO write enable generation
-	fifo_wren <= S_AXIS_TVALID and axis_tready;
-
-	-- FIFO Implementation
-	 FIFO_GEN: for byte_index in 0 to (C_S_AXIS_TDATA_WIDTH/8-1) generate
-
-	 signal stream_data_fifo : BYTE_FIFO_TYPE;
-	 begin   
-	  -- Streaming input data is stored in FIFO
-	  process(S_AXIS_ACLK)
-	  begin
-	    if (rising_edge (S_AXIS_ACLK)) then
-	      if (fifo_wren = '1') then
-	        stream_data_fifo(write_pointer) <= S_AXIS_TDATA((byte_index*8+7) downto (byte_index*8));
-	      end if;  
-	    end  if;
-	  end process;
-
-	end generate FIFO_GEN;
-
-	-- Add user logic here
-
-	-- User logic ends
-
+  -- The 9th and 10th bits are the VALID_N signal
+  -- (applies when using DC balanced encoding)
+  txdata_o(8) <= valid_n;
+  txdata_o(9) <= valid_n;
+  
 end arch_imp;
