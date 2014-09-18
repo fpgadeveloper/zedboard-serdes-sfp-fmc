@@ -215,4 +215,4 @@ begin
     RST => rst_i
   );
   
-end transceiver;
+end transceiver_syn;

@@ -44,7 +44,7 @@ begin
   ----------------------------------------------------------------------------------------------------
   -- IDELAY Control
   ----------------------------------------------------------------------------------------------------
-  iodelay_ce <= iodelay_inc or iodelay_dec;
+  iodelay_ce <= iodelay_inc_i or iodelay_dec_i;
 
   ----------------------------------------------------------------------------------------------------
   -- Receive clock
@@ -117,7 +117,9 @@ begin
 
       C => clk_i,
       CE => iodelay_ce,
-      INC => iodelay_inc,
+      INC => iodelay_inc_i,
+      LD => '0',
+      LDPIPEEN => '0',
       DATAIN => '0',
       REGRST => rst_i,
       CNTVALUEIN => conv_std_logic_vector(RXDATA_IDELAY, 5),
