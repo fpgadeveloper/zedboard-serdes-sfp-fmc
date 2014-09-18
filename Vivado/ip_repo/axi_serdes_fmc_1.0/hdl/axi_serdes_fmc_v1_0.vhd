@@ -349,15 +349,15 @@ axi_serdes_fmc_v1_0_M00_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     txclk_p_o      => trx0_txclk_p_o,
     txclk_n_o      => trx0_txclk_n_o,
     -- Transmitter control
-    txrst_i        => , -- from registers
+    txrst_i        => '0', -- from registers
     txrst_o        => trx0_txrst_o,
-    txdcbal_i      => , -- from registers
+    txdcbal_i      => '0', -- from registers
     txdcbal_o      => trx0_txdcbal_o,
     txlock_i       => trx0_txlock_i,
-    txlock_o       => , -- from registers
+    txlock_o       => open, -- from registers
     -- Receiver interface
-    iodelay_inc_i  => , -- from registers
-    iodelay_dec_i  => , -- from registers
+    iodelay_inc_i  => '0', -- from registers
+    iodelay_dec_i  => '0', -- from registers
     rxdata_p_i     => trx0_rxdata_p_i,
     rxdata_n_i     => trx0_rxdata_n_i,
     rxclk_p_i      => trx0_rxclk_p_i,
@@ -365,12 +365,12 @@ axi_serdes_fmc_v1_0_M00_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     rxclk_o        => trx0_rxclk, -- to AXIS master
     rxdata_o       => trx0_rxdata, -- to AXIS master
     -- Receiver control
-    rxrst_i        => , -- from registers
+    rxrst_i        => '0', -- from registers
     rxrst_o        => trx0_rxrst_o,
-    rxdcbal_i      => , -- from registers
+    rxdcbal_i      => '0', -- from registers
     rxdcbal_o      => trx0_rxdcbal_o,
     rxlock_i       => trx0_rxlock_i,
-    rxlock_o       =>  -- from registers
+    rxlock_o       => open -- from registers
   );
   
   
@@ -395,15 +395,15 @@ axi_serdes_fmc_v1_0_M00_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     txclk_p_o      => trx1_txclk_p_o,
     txclk_n_o      => trx1_txclk_n_o,
     -- Transmitter control
-    txrst_i        => , -- from registers
+    txrst_i        => '0', -- from registers
     txrst_o        => trx1_txrst_o,
-    txdcbal_i      => , -- from registers
+    txdcbal_i      => '0', -- from registers
     txdcbal_o      => trx1_txdcbal_o,
     txlock_i       => trx1_txlock_i,
-    txlock_o       => , -- from registers
+    txlock_o       => open, -- from registers
     -- Receiver interface
-    iodelay_inc_i  => , -- from registers
-    iodelay_dec_i  => , -- from registers
+    iodelay_inc_i  => '0', -- from registers
+    iodelay_dec_i  => '0', -- from registers
     rxdata_p_i     => trx1_rxdata_p_i,
     rxdata_n_i     => trx1_rxdata_n_i,
     rxclk_p_i      => trx1_rxclk_p_i,
@@ -411,12 +411,12 @@ axi_serdes_fmc_v1_0_M00_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     rxclk_o        => trx1_rxclk, -- to AXIS master
     rxdata_o       => trx1_rxdata, -- to AXIS master
     -- Receiver control
-    rxrst_i        => , -- from registers
+    rxrst_i        => '0', -- from registers
     rxrst_o        => trx1_rxrst_o,
-    rxdcbal_i      => , -- from registers
+    rxdcbal_i      => '0', -- from registers
     rxdcbal_o      => trx1_rxdcbal_o,
     rxlock_i       => trx1_rxlock_i,
-    rxlock_o       =>  -- from registers
+    rxlock_o       => open -- from registers
   );
 
 	-- User logic ends
