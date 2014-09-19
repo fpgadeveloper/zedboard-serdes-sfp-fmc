@@ -40,11 +40,13 @@ architecture tb of tb_loopback is
   -----------------------------------------------------------------------
 
   -- General inputs
-  signal aresetn                         : std_logic := '0';
-  signal aclk                            : std_logic := '0';  -- the master clock
-  signal aclk_x                          : std_logic := '0';  -- the master clock
-  signal rxclk_p                         : std_logic := '0';  -- the receive clock
-  signal rxclk_n                         : std_logic := '0';  -- the receive clock
+  signal aresetn              : std_logic := '0';
+  signal aclk                 : std_logic := '0';  -- the master clock
+  signal aclk_x               : std_logic := '0';  -- the master clock
+  signal trx0_rxclk_p         : std_logic := '0';  -- the receive clock
+  signal trx0_rxclk_n         : std_logic := '0';  -- the receive clock
+  signal trx1_rxclk_p         : std_logic := '0';  -- the receive clock
+  signal trx1_rxclk_n         : std_logic := '0';  -- the receive clock
 
   signal rst_i          : std_logic := '0';
   signal clk_i          : std_logic := '0';
@@ -94,8 +96,8 @@ architecture tb of tb_loopback is
   signal trx1_txclk_p_o      : std_logic := '0';
   signal trx1_txclk_n_o      : std_logic := '0';
   -- Transmitter control
-  signal trx1_txrst_o        :  std_logic := '0';
-  signal trx1_txdcbal_o      :  std_logic := '0';
+  signal trx1_txrst_o        : std_logic := '0';
+  signal trx1_txdcbal_o      : std_logic := '0';
   signal trx1_txlock_i       : std_logic := '0';
   -- Receiver interface
   signal trx1_rxdata_p_i     : std_logic_vector(4 downto 0) := (others => '0');
@@ -103,8 +105,8 @@ architecture tb of tb_loopback is
   signal trx1_rxclk_p_i      : std_logic := '0';
   signal trx1_rxclk_n_i      : std_logic := '0';
   -- Receiver control
-  signal trx1_rxrst_o        :  std_logic := '0';
-  signal trx1_rxdcbal_o      :  std_logic := '0';
+  signal trx1_rxrst_o        : std_logic := '0';
+  signal trx1_rxdcbal_o      : std_logic := '0';
   signal trx1_rxlock_i       : std_logic := '0';
 
 	-- Ports of Axi Slave Bus Interface S00_AXI
@@ -113,27 +115,27 @@ architecture tb of tb_loopback is
 	signal s00_axi_awaddr	  : std_logic_vector(C_S00_AXI_ADDR_WIDTH-1 downto 0) := (others => '0');
 	signal s00_axi_awprot	  : std_logic_vector(2 downto 0) := (others => '0');
 	signal s00_axi_awvalid	: std_logic := '0';
-	signal s00_axi_awready	:  std_logic := '0';
+	signal s00_axi_awready	: std_logic := '0';
 	signal s00_axi_wdata	  : std_logic_vector(C_S00_AXI_DATA_WIDTH-1 downto 0) := (others => '0');
 	signal s00_axi_wstrb	  : std_logic_vector((C_S00_AXI_DATA_WIDTH/8)-1 downto 0) := (others => '0');
 	signal s00_axi_wvalid	  : std_logic := '0';
-	signal s00_axi_wready	  :  std_logic := '0';
-	signal s00_axi_bresp	  :  std_logic_vector(1 downto 0) := (others => '0');
-	signal s00_axi_bvalid	  :  std_logic := '0';
+	signal s00_axi_wready	  : std_logic := '0';
+	signal s00_axi_bresp	  : std_logic_vector(1 downto 0) := (others => '0');
+	signal s00_axi_bvalid	  : std_logic := '0';
 	signal s00_axi_bready	  : std_logic := '0';
 	signal s00_axi_araddr	  : std_logic_vector(C_S00_AXI_ADDR_WIDTH-1 downto 0) := (others => '0');
 	signal s00_axi_arprot	  : std_logic_vector(2 downto 0) := (others => '0');
 	signal s00_axi_arvalid	: std_logic := '0';
-	signal s00_axi_arready	:  std_logic := '0';
-	signal s00_axi_rdata	  :  std_logic_vector(C_S00_AXI_DATA_WIDTH-1 downto 0) := (others => '0');
-	signal s00_axi_rresp	  :  std_logic_vector(1 downto 0) := (others => '0');
-	signal s00_axi_rvalid	  :  std_logic := '0';
+	signal s00_axi_arready	: std_logic := '0';
+	signal s00_axi_rdata	  : std_logic_vector(C_S00_AXI_DATA_WIDTH-1 downto 0) := (others => '0');
+	signal s00_axi_rresp	  : std_logic_vector(1 downto 0) := (others => '0');
+	signal s00_axi_rvalid	  : std_logic := '0';
 	signal s00_axi_rready	  : std_logic := '0';
 
 	-- Ports of Axi Slave Bus Interface S00_AXIS
 	signal s00_axis_aclk	  : std_logic := '0';
 	signal s00_axis_aresetn	: std_logic := '0';
-	signal s00_axis_tready	:  std_logic := '0';
+	signal s00_axis_tready	: std_logic := '0';
 	signal s00_axis_tdata	  : std_logic_vector(C_S00_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
 	signal s00_axis_tstrb	  : std_logic_vector((C_S00_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
 	signal s00_axis_tlast	  : std_logic := '0';
@@ -142,11 +144,29 @@ architecture tb of tb_loopback is
 	-- Ports of Axi Master Bus Interface M00_AXIS
 	signal m00_axis_aclk	  : std_logic := '0';
 	signal m00_axis_aresetn	: std_logic := '0';
-	signal m00_axis_tvalid	:  std_logic := '0';
-	signal m00_axis_tdata	  :  std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
-	signal m00_axis_tstrb	  :  std_logic_vector((C_M00_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
-	signal m00_axis_tlast	  :  std_logic := '0';
+	signal m00_axis_tvalid	: std_logic := '0';
+	signal m00_axis_tdata	  : std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
+	signal m00_axis_tstrb	  : std_logic_vector((C_M00_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
+	signal m00_axis_tlast	  : std_logic := '0';
 	signal m00_axis_tready	: std_logic := '0';
+  
+	-- Ports of Axi Slave Bus Interface S01_AXIS
+	signal s01_axis_aclk	  : std_logic := '0';
+	signal s01_axis_aresetn	: std_logic := '0';
+	signal s01_axis_tready	: std_logic := '0';
+	signal s01_axis_tdata	  : std_logic_vector(C_S00_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
+	signal s01_axis_tstrb	  : std_logic_vector((C_S00_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
+	signal s01_axis_tlast	  : std_logic := '0';
+	signal s01_axis_tvalid	: std_logic := '0';
+
+	-- Ports of Axi Master Bus Interface M01_AXIS
+	signal m01_axis_aclk	  : std_logic := '0';
+	signal m01_axis_aresetn	: std_logic := '0';
+	signal m01_axis_tvalid	: std_logic := '0';
+	signal m01_axis_tdata	  : std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
+	signal m01_axis_tstrb	  : std_logic_vector((C_M00_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
+	signal m01_axis_tlast	  : std_logic := '0';
+	signal m01_axis_tready	: std_logic := '0';
   
   -----------------------------------------------------------------------
   -- Aliases for AXI channel TDATA and TUSER fields
@@ -270,14 +290,37 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
 		m00_axis_tdata	  => m00_axis_tdata	,
 		m00_axis_tstrb	  => m00_axis_tstrb	,
 		m00_axis_tlast	  => m00_axis_tlast	,
-		m00_axis_tready	  => m00_axis_tready	
+		m00_axis_tready	  => m00_axis_tready,
+    
+		-- Ports of Axi Slave Bus Interface S01_AXIS
+		s01_axis_aclk	    => s01_axis_aclk	  ,
+		s01_axis_aresetn	=> s01_axis_aresetn,
+		s01_axis_tready	  => s01_axis_tready	,
+		s01_axis_tdata	  => s01_axis_tdata	,
+		s01_axis_tstrb	  => s01_axis_tstrb	,
+		s01_axis_tlast	  => s01_axis_tlast	,
+		s01_axis_tvalid	  => s01_axis_tvalid	,
+
+		-- Ports of Axi Master Bus Interface M01_AXIS
+		m01_axis_aclk	    => m01_axis_aclk	  ,
+		m01_axis_aresetn	=> m01_axis_aresetn,
+		m01_axis_tvalid	  => m01_axis_tvalid	,
+		m01_axis_tdata	  => m01_axis_tdata	,
+		m01_axis_tstrb	  => m01_axis_tstrb	,
+		m01_axis_tlast	  => m01_axis_tlast	,
+		m01_axis_tready	  => m01_axis_tready	
 	);
 
   -- Loopback transmit pins to receive pins
   trx0_rxdata_p_i <= trx0_txdata_p_o;
   trx0_rxdata_n_i <= trx0_txdata_n_o;
-  trx0_rxclk_p_i  <= rxclk_p; -- delayed transmit clock
-  trx0_rxclk_n_i  <= rxclk_n; -- delayed transmit clock
+  trx0_rxclk_p_i  <= trx0_rxclk_p; -- delayed transmit clock
+  trx0_rxclk_n_i  <= trx0_rxclk_n; -- delayed transmit clock
+  
+  trx1_rxdata_p_i <= trx1_txdata_p_o;
+  trx1_rxdata_n_i <= trx1_txdata_n_o;
+  trx1_rxclk_p_i  <= trx1_rxclk_p; -- delayed transmit clock
+  trx1_rxclk_n_i  <= trx1_rxclk_n; -- delayed transmit clock
   
   -- Transceiver clock
   trx0_clk_i <= aclk_x;
@@ -290,36 +333,62 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
   -- AXI streaming slave
   s00_axis_aclk <= aclk;
   s00_axis_aresetn <= aresetn;
+  s01_axis_aclk <= aclk;
+  s01_axis_aresetn <= aresetn;
   
   -- AXI streaming master
   m00_axis_aclk <= aclk;
   m00_axis_aresetn <= aresetn;
+  m01_axis_aclk <= aclk;
+  m01_axis_aresetn <= aresetn;
   
   -----------------------------------------------------------------------
   -- Generate clock
   -----------------------------------------------------------------------
 
   -- Adds delay to transmit clock (normally added by deserializer)
-  rxclk_gen : process
+  trx0_rxclk_gen : process
   begin
-    rxclk_p <= '0';
-    rxclk_n <= '1';
+    trx0_rxclk_p <= '0';
+    trx0_rxclk_n <= '1';
     if (end_of_simulation) then
       wait;
     else
       wait for CLOCK_PERIOD;
       loop
-        rxclk_p <= '0';
-        rxclk_n <= '1';
+        trx0_rxclk_p <= '0';
+        trx0_rxclk_n <= '1';
         wait until trx0_txclk_p_o = '1';
         wait for CLOCK_PERIOD_X/4;
-        rxclk_p <= '1';
-        rxclk_n <= '0';
+        trx0_rxclk_p <= '1';
+        trx0_rxclk_n <= '0';
         wait until trx0_txclk_p_o = '0';
         wait for CLOCK_PERIOD_X/4;
       end loop;
     end if;
-  end process rxclk_gen;
+  end process trx0_rxclk_gen;
+
+  -- Adds delay to transmit clock (normally added by deserializer)
+  trx1_rxclk_gen : process
+  begin
+    trx1_rxclk_p <= '0';
+    trx1_rxclk_n <= '1';
+    if (end_of_simulation) then
+      wait;
+    else
+      wait for CLOCK_PERIOD;
+      loop
+        trx1_rxclk_p <= '0';
+        trx1_rxclk_n <= '1';
+        wait until trx1_txclk_p_o = '1';
+        wait for CLOCK_PERIOD_X/4;
+        trx1_rxclk_p <= '1';
+        trx1_rxclk_n <= '0';
+        wait until trx1_txclk_p_o = '0';
+        wait for CLOCK_PERIOD_X/4;
+      end loop;
+    end if;
+  end process trx1_rxclk_gen;
 
   -- AXI clock generator
   clock_gen : process
@@ -371,24 +440,24 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     wait for T_RST;
     aresetn <= '1';
     
-    -- Input an incrementing number each cycle
-    bytenum := "00000000";  -- start with byte number 0
+    -- Send data 10 times
     for cycle in 0 to 10 loop
       s00_axis_tvalid  <= '1';
-      -- Send 1 packet
-      s00_axis_tdata(7 downto 0) <= x"BA";
-      s00_axis_tdata(15 downto 8) <= x"DC";
-      s00_axis_tdata(23 downto 16) <= x"FE";
-      s00_axis_tdata(31 downto 24) <= x"99";
+      s01_axis_tvalid  <= '1';
+      -- Send 4 bytes on both transmitters
+      s00_axis_tdata <= x"98FEDCBA";
+      s01_axis_tdata <= x"87654321";
       wait for CLOCK_PERIOD;
-      -- Send sync
-      s00_axis_tdata <= (others => '0');
+      -- Send sync (valid signal LOW)
+      s00_axis_tdata <= (others => '0'); -- Zeroing data is not actually necessary
+      s01_axis_tdata <= (others => '0'); -- but it looks nicer in simulation
       s00_axis_tvalid  <= '0';
+      s01_axis_tvalid  <= '0';
       wait for CLOCK_PERIOD;
-      bytenum := bytenum + "00000100";
     end loop;
     
     s00_axis_tvalid <= '0';
+    s01_axis_tvalid <= '0';
 
     -- End of test
     end_of_simulation <= true;           

@@ -128,19 +128,22 @@ begin
 
     -- DDR
     --------------------------------------------------------------------
-    -- Deserializer receives bits in order from LSB to MSB
-    -- therefore we must ensure that IDDR is wired such that:
-    -- First clock cycle receives the lower 5-bit nibble.
-    -- Second clock cycle receives the higher 5-bit nibble.
+    -- The deserializer presents the lower significant nibble (LSN) before
+    -- the high significant nibble (HSN). The LSN must be clocked into
+    -- the FPGA on the FALLING edge of the clock and the HSN on the rising.
+    -- However, the IDDR primitive outputs the first data on the rising edge,
+    -- therefore we need to negate the clock at the input (C).
+    -- First clock cycle (rising edge) receives the lower 5-bit nibble.
+    -- Second clock cycle (falling edge) receives the higher 5-bit nibble.
     --------------------------------------------------------------------
     iddr_inst : IDDR
     generic map (
       DDR_CLK_EDGE => "SAME_EDGE_PIPELINED"
     )
     port map (
-      Q1 => rxdata_sdr(i),   -- First clock cycle: Low nibble
-      Q2 => rxdata_sdr(i+5), -- Second clock cycle: High nibble
-      C  => rxclk_bufio,
+      Q1 => rxdata_sdr(i),    -- Rising edge: Low nibble
+      Q2 => rxdata_sdr(i+5),  -- Falling edge: High nibble
+      C  => not rxclk_bufio,  -- Clock is negated
       CE => '1',
       D  => rxdata_delay(i),
       R  => '0',

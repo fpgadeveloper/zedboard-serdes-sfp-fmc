@@ -31,7 +31,14 @@ begin
   -- Forwarded transmit clock
   ----------------------------------------------------------------------------------------------------
 
-  -- Clock DDR
+  -- Clock DDR for clock forwarding
+  -----------------------------------------------------
+  -- The serializer wants the clock LEVEL to be low on the lower significant
+  -- nibble and high on the higher significant nibble. When the internal delay
+  -- is applied to the clock, this allows the lower nibble to be clocked in on
+  -- the falling edge and the higher nibble on the rising edge.
+  -- For more information on the LVDS DDR interface,
+  -- see datasheet of DS32EL0124, specifically page 11, figure 6.
   clk_oddr_inst : ODDR
   generic map (
     DDR_CLK_EDGE => "SAME_EDGE"
@@ -40,8 +47,8 @@ begin
     Q => txclk_ddr,
     C => txclk_i,
     CE => '1',
-    D1 => '0',
-    D2 => '1',
+    D1 => '0', -- Rising edge, low nibble, low clock
+    D2 => '1', -- Falling edge, high nibble, high clock
     R => '0',
     S => '0'
   );
@@ -62,8 +69,9 @@ begin
 
     -- Data DDRs
     --------------------------------------------------------------------
-    -- First clock cycle transmits the lower 5-bit nibble.
-    -- Second clock cycle transmits the higher 5-bit nibble.
+    -- The serializer wants the lower nibble to precede the higher nibble.
+    -- First clock cycle (rising edge) transmits the lower 5-bit nibble.
+    -- Second clock cycle (falling edge) transmits the higher 5-bit nibble.
     -- This ensures that the serializer outputs the bits in order
     -- from the LSB to the MSB.
     --------------------------------------------------------------------
@@ -75,8 +83,8 @@ begin
       Q => txdata_ddr(i),
       C => txclk_i,
       CE => '1',
-      D1 => txdata_i(i),    -- First clock cycle: low nibble
-      D2 => txdata_i(i+5),  -- Second clock cycle: high nibble
+      D1 => txdata_i(i),   -- Rising edge: Low nibble
+      D2 => txdata_i(i+5), -- Falling edge: High nibble
       R => '0',
       S => '0'
     );
