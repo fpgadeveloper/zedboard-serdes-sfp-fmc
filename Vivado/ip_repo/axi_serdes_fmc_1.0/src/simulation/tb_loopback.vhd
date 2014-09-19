@@ -48,8 +48,6 @@ architecture tb of tb_loopback is
   signal trx1_rxclk_p         : std_logic := '0';  -- the receive clock
   signal trx1_rxclk_n         : std_logic := '0';  -- the receive clock
 
-  signal rst_i          : std_logic := '0';
-  signal clk_i          : std_logic := '0';
   signal clk_200mhz_i   : std_logic := '0';
   --------------------------------------------------------
   -- Transceiver 0 ports
@@ -187,8 +185,6 @@ begin
 axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
 	port map (
 		-- Users to add ports here
-    rst_i          => rst_i,
-    clk_i          => clk_i,
     clk_200mhz_i   => clk_200mhz_i,
     --------------------------------------------------------
     -- Transceiver 0 ports
@@ -322,9 +318,15 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
   trx1_rxclk_p_i  <= trx1_rxclk_p; -- delayed transmit clock
   trx1_rxclk_n_i  <= trx1_rxclk_n; -- delayed transmit clock
   
-  -- Transceiver clock
-  trx0_clk_i <= aclk_x;
-  trx1_clk_i <= aclk_x;
+  -- Clock from FMC
+  trx0_clk_p_i <= aclk_x;
+  trx0_clk_n_i <= not aclk_x;
+  trx1_clk_p_i <= aclk_x;
+  trx1_clk_n_i <= not aclk_x;
+  
+  -- Global buffer clock fed back into core
+  trx0_clk_i <= trx0_clk_bufg_o;
+  trx1_clk_i <= trx1_clk_bufg_o;
   
   -- AXI slave
   s00_axi_aclk <= aclk;

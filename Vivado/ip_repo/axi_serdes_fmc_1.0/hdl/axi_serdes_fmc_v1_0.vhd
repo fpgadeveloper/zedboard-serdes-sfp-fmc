@@ -24,9 +24,7 @@ entity axi_serdes_fmc_v1_0 is
 	);
 	port (
 		-- Users to add ports here
-    rst_i          : in std_logic;
-    clk_i          : in std_logic;
-    clk_200mhz_i   : in std_logic;
+    clk_200mhz_i        : in std_logic;
     --------------------------------------------------------
     -- Transceiver 0 ports
     --------------------------------------------------------
@@ -383,12 +381,12 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
 
   transceiver0_inst : transceiver
   generic map (
-    RXDATA_IDELAY => 16
+    RXDATA_IDELAY => 0
   )
   port map (
-    rst_i          => rst_i,
-    clk_i          => clk_i,
-    clk_200mhz_i   => clk_200mhz_i,
+    rst_i          => not s00_axi_aresetn, -- For IDELAY control
+    clk_i          => s00_axi_aclk,        -- For IDELAY control
+    clk_200mhz_i   => clk_200mhz_i,        -- For IDELAYCTRL
     -- Input clock
     clk_p_i        => trx0_clk_p_i,
     clk_n_i        => trx0_clk_n_i,
@@ -429,12 +427,12 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
   
   transceiver1_inst : transceiver
   generic map (
-    RXDATA_IDELAY => 16
+    RXDATA_IDELAY => 0
   )
   port map (
-    rst_i          => rst_i,
-    clk_i          => clk_i,
-    clk_200mhz_i   => clk_200mhz_i,
+    rst_i          => not s00_axi_aresetn, -- For IDELAY control
+    clk_i          => s00_axi_aclk,        -- For IDELAY control
+    clk_200mhz_i   => clk_200mhz_i,        -- For IDELAYCTRL
     -- Input clock
     clk_p_i        => trx1_clk_p_i,
     clk_n_i        => trx1_clk_n_i,
