@@ -342,7 +342,7 @@ axi_serdes_fmc_v1_0_M00_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     -- Output clock
     clk_bufg_o     => trx0_clk_bufg_o,
     -- Transmitter interface
-    txclk_i        => trx0_txclk, -- from AXIS slave
+    txclk_i        => trx0_clk_i,  -- clocked by global transceiver clock
     txdata_i       => trx0_txdata, -- from AXIS slave
     txdata_p_o     => trx0_txdata_p_o,
     txdata_n_o     => trx0_txdata_n_o,
@@ -388,7 +388,7 @@ axi_serdes_fmc_v1_0_M00_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     -- Output clock
     clk_bufg_o     => trx1_clk_bufg_o,
     -- Transmitter interface
-    txclk_i        => trx1_txclk, -- from AXIS slave
+    txclk_i        => trx1_clk_i,  -- clocked by global transceiver clock
     txdata_i       => trx1_txdata, -- from AXIS slave
     txdata_p_o     => trx1_txdata_p_o,
     txdata_n_o     => trx1_txdata_n_o,

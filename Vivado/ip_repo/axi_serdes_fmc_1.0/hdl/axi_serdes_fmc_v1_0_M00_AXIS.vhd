@@ -74,16 +74,16 @@ begin
   rst <= not M_AXIS_ARESETN;
   
   -- FIFO write enable:
-  -- rxdata_i 9th and 10th bits are VALID_N signals from deserializer
+  -- rxdata_i 5th and 10th bits are VALID_N signals from deserializer
   -- (applies when using DC balanced encoding)
-  wr_en <= not rxdata_i(8);
+  wr_en <= not rxdata_i(9);
 
   fifo_8bit_to_32bit_inst : fifo_8bit_to_32bit
   PORT MAP (
     rst    => rst,
     wr_clk => rxclk_i,      -- Received clock (should be synchronous with global clock)
     rd_clk => M_AXIS_ACLK,  -- AXIS clock = Global clock / 4
-    din    => rxdata_i(7 downto 0),
+    din    => rxdata_i(8 downto 5) & rxdata_i(3 downto 0),
     wr_en  => wr_en,
     rd_en  => '1',  -- Always read from FIFO
     dout   => M_AXIS_TDATA,

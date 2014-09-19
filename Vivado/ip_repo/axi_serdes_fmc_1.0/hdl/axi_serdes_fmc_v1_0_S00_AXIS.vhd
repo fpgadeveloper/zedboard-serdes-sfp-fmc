@@ -71,15 +71,16 @@ begin
     din    => S_AXIS_TDATA,
     wr_en  => S_AXIS_TVALID,
     rd_en  => '1',  -- Always read from FIFO
-    dout   => txdata_o(7 downto 0),
+    dout(7 downto 4) => txdata_o(8 downto 5),
+    dout(3 downto 0) => txdata_o(3 downto 0),
     full   => open,
     empty  => open,
     valid  => valid_n
   );
 
-  -- The 9th and 10th bits are the VALID_N signal
+  -- The 5th and 10th bits are the VALID_N signal
   -- (applies when using DC balanced encoding)
-  txdata_o(8) <= valid_n;
+  txdata_o(4) <= valid_n;
   txdata_o(9) <= valid_n;
   
 end arch_imp;

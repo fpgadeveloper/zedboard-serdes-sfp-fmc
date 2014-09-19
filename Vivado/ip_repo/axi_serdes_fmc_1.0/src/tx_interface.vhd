@@ -63,7 +63,7 @@ begin
     -- Data DDRs
     data_iddr_inst : ODDR
     generic map (
-      DDR_CLK_EDGE => "SAME_EDGE_PIPELINED"
+      DDR_CLK_EDGE => "SAME_EDGE"
     )
     port map (
       Q => txdata_ddr(i),
