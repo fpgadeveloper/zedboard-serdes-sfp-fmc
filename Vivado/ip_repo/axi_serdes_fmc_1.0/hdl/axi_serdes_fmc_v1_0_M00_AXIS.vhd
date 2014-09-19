@@ -86,7 +86,13 @@ begin
     din    => rxdata_i(8 downto 5) & rxdata_i(3 downto 0),
     wr_en  => wr_en,
     rd_en  => '1',  -- Always read from FIFO
-    dout   => M_AXIS_TDATA,
+    -- We reverse the byte order at the output of the FIFO
+    -- so that the correct 32-bit word is output to AXI bus
+    -- (the transmit interface reverses the byte order)
+    dout(7 downto 0)   => M_AXIS_TDATA(31 downto 24),
+    dout(15 downto 8)  => M_AXIS_TDATA(23 downto 16),
+    dout(23 downto 16) => M_AXIS_TDATA(15 downto 8),
+    dout(31 downto 24) => M_AXIS_TDATA(7 downto 0),
     full   => open,
     empty  => open,
     valid  => M_AXIS_TVALID

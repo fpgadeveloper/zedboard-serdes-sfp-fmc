@@ -127,13 +127,19 @@ begin
     );
 
     -- DDR
+    --------------------------------------------------------------------
+    -- Deserializer receives bits in order from LSB to MSB
+    -- therefore we must ensure that IDDR is wired such that:
+    -- First clock cycle receives the lower 5-bit nibble.
+    -- Second clock cycle receives the higher 5-bit nibble.
+    --------------------------------------------------------------------
     iddr_inst : IDDR
     generic map (
       DDR_CLK_EDGE => "SAME_EDGE_PIPELINED"
     )
     port map (
-      Q1 => rxdata_sdr(2*i),
-      Q2 => rxdata_sdr(2*i+1),
+      Q1 => rxdata_sdr(i),   -- First clock cycle: Low nibble
+      Q2 => rxdata_sdr(i+5), -- Second clock cycle: High nibble
       C  => rxclk_bufio,
       CE => '1',
       D  => rxdata_delay(i),

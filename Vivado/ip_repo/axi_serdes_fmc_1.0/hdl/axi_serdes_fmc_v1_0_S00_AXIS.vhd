@@ -68,7 +68,13 @@ begin
     rst    => rst,
     wr_clk => S_AXIS_ACLK, -- AXIS clock = global clock / 4
     rd_clk => txclk_i,     -- Global clock
-    din    => S_AXIS_TDATA,
+    -- We reverse the byte order at the input to the FIFO
+    -- so that the bytes come out in order of the lowest
+    -- significant byte to highest significant byte
+    din(7 downto 0)   => S_AXIS_TDATA(31 downto 24),
+    din(15 downto 8)  => S_AXIS_TDATA(23 downto 16),
+    din(23 downto 16) => S_AXIS_TDATA(15 downto 8),
+    din(31 downto 24) => S_AXIS_TDATA(7 downto 0),
     wr_en  => S_AXIS_TVALID,
     rd_en  => '1',  -- Always read from FIFO
     dout(7 downto 4) => txdata_o(8 downto 5),

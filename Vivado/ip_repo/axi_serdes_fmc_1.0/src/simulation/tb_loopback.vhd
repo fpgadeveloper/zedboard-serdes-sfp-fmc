@@ -312,11 +312,11 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
         rxclk_p <= '0';
         rxclk_n <= '1';
         wait until trx0_txclk_p_o = '1';
-        wait for CLOCK_PERIOD_X/2;
+        wait for CLOCK_PERIOD_X/4;
         rxclk_p <= '1';
         rxclk_n <= '0';
         wait until trx0_txclk_p_o = '0';
-        wait for CLOCK_PERIOD_X/2;
+        wait for CLOCK_PERIOD_X/4;
       end loop;
     end if;
   end process rxclk_gen;
@@ -373,12 +373,17 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     
     -- Input an incrementing number each cycle
     bytenum := "00000000";  -- start with byte number 0
-    for cycle in 0 to 159 loop
+    for cycle in 0 to 10 loop
       s00_axis_tvalid  <= '1';
-      s00_axis_tdata(7 downto 0) <= std_logic_vector(bytenum);
-      s00_axis_tdata(15 downto 8) <= std_logic_vector(bytenum+"00000001");
-      s00_axis_tdata(23 downto 16) <= std_logic_vector(bytenum+"00000010");
-      s00_axis_tdata(31 downto 24) <= std_logic_vector(bytenum+"00000011");
+      -- Send 1 packet
+      s00_axis_tdata(7 downto 0) <= x"BA";
+      s00_axis_tdata(15 downto 8) <= x"DC";
+      s00_axis_tdata(23 downto 16) <= x"FE";
+      s00_axis_tdata(31 downto 24) <= x"99";
+      wait for CLOCK_PERIOD;
+      -- Send sync
+      s00_axis_tdata <= (others => '0');
+      s00_axis_tvalid  <= '0';
       wait for CLOCK_PERIOD;
       bytenum := bytenum + "00000100";
     end loop;

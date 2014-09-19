@@ -40,8 +40,8 @@ begin
     Q => txclk_ddr,
     C => txclk_i,
     CE => '1',
-    D1 => '1',
-    D2 => '0',
+    D1 => '0',
+    D2 => '1',
     R => '0',
     S => '0'
   );
@@ -61,6 +61,12 @@ begin
   data: for i in 0 to 4 generate
 
     -- Data DDRs
+    --------------------------------------------------------------------
+    -- First clock cycle transmits the lower 5-bit nibble.
+    -- Second clock cycle transmits the higher 5-bit nibble.
+    -- This ensures that the serializer outputs the bits in order
+    -- from the LSB to the MSB.
+    --------------------------------------------------------------------
     data_iddr_inst : ODDR
     generic map (
       DDR_CLK_EDGE => "SAME_EDGE"
@@ -69,8 +75,8 @@ begin
       Q => txdata_ddr(i),
       C => txclk_i,
       CE => '1',
-      D1 => txdata_i(2*i),
-      D2 => txdata_i(2*i+1),
+      D1 => txdata_i(i),    -- First clock cycle: low nibble
+      D2 => txdata_i(i+5),  -- Second clock cycle: high nibble
       R => '0',
       S => '0'
     );
