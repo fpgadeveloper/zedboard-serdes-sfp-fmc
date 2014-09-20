@@ -31,8 +31,9 @@ entity axi_serdes_fmc_v1_0 is
     -- Input clock from FMC
     trx0_clk_p_i        : in  std_logic;
     trx0_clk_n_i        : in  std_logic;
-    -- Output clock
-    trx0_clk_bufg_o     : out std_logic;
+    -- Output clocks
+    trx0_clk_bufg_div_o : out std_logic;
+    trx0_clk_bufr_o     : out std_logic;
     -- Input clock from user design
     trx0_clk_i          : in std_logic;
     -- Transmitter interface
@@ -60,8 +61,9 @@ entity axi_serdes_fmc_v1_0 is
     -- Input clock from FMC
     trx1_clk_p_i        : in  std_logic;
     trx1_clk_n_i        : in  std_logic;
-    -- Output clock
-    trx1_clk_bufg_o     : out std_logic;
+    -- Output clocks
+    trx1_clk_bufg_div_o : out std_logic;
+    trx1_clk_bufr_o     : out std_logic;
     -- Input clock from user design
     trx1_clk_i          : in std_logic;
     -- Transmitter interface
@@ -230,8 +232,9 @@ architecture arch_imp of axi_serdes_fmc_v1_0 is
       -- Input clock
       clk_p_i        : in  std_logic;
       clk_n_i        : in  std_logic;
-      -- Output clock
-      clk_bufg_o     : out std_logic;
+      -- Output clocks
+      clk_bufg_div_o : out std_logic;
+      clk_bufr_o     : out std_logic;
       -- Transmitter interface
       txclk_i        : in std_logic;
       txdata_i       : in std_logic_vector(9 downto 0);
@@ -390,8 +393,9 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     -- Input clock
     clk_p_i        => trx0_clk_p_i,
     clk_n_i        => trx0_clk_n_i,
-    -- Output clock
-    clk_bufg_o     => trx0_clk_bufg_o,
+    -- Output clocks
+    clk_bufg_div_o => trx0_clk_bufg_div_o,
+    clk_bufr_o     => trx0_clk_bufr_o,
     -- Transmitter interface
     txclk_i        => trx0_clk_i,  -- clocked by global transceiver clock
     txdata_i       => trx0_txdata, -- from AXIS slave
@@ -436,8 +440,9 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     -- Input clock
     clk_p_i        => trx1_clk_p_i,
     clk_n_i        => trx1_clk_n_i,
-    -- Output clock
-    clk_bufg_o     => trx1_clk_bufg_o,
+    -- Output clocks
+    clk_bufg_div_o => trx1_clk_bufg_div_o,
+    clk_bufr_o     => trx1_clk_bufr_o,
     -- Transmitter interface
     txclk_i        => trx1_clk_i,  -- clocked by global transceiver clock
     txdata_i       => trx1_txdata, -- from AXIS slave

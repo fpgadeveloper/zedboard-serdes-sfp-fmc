@@ -41,7 +41,6 @@ architecture tb of tb_loopback is
 
   -- General inputs
   signal aresetn              : std_logic := '0';
-  signal aclk                 : std_logic := '0';  -- the master clock
   signal aclk_x               : std_logic := '0';  -- the master clock
   signal trx0_rxclk_p         : std_logic := '0';  -- the receive clock
   signal trx0_rxclk_n         : std_logic := '0';  -- the receive clock
@@ -55,8 +54,9 @@ architecture tb of tb_loopback is
   -- Input clock from FMC
   signal trx0_clk_p_i        : std_logic := '0';
   signal trx0_clk_n_i        : std_logic := '0';
-  -- Output clock
-  signal trx0_clk_bufg_o     : std_logic := '0';
+  -- Output clocks
+  signal trx0_clk_bufg_div_o : std_logic := '0';
+  signal trx0_clk_bufr_o     : std_logic := '0';
   -- Input clock from user design
   signal trx0_clk_i          : std_logic := '0';
   -- Transmitter interface
@@ -84,8 +84,9 @@ architecture tb of tb_loopback is
   -- Input clock from FMC
   signal trx1_clk_p_i        : std_logic := '0';
   signal trx1_clk_n_i        : std_logic := '0';
-  -- Output clock
-  signal trx1_clk_bufg_o     : std_logic := '0';
+  -- Output clocks
+  signal trx1_clk_bufg_div_o : std_logic := '0';
+  signal trx1_clk_bufr_o     : std_logic := '0';
   -- Input clock from user design
   signal trx1_clk_i          : std_logic := '0';
   -- Transmitter interface
@@ -192,8 +193,9 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     -- Input clock from FMC
     trx0_clk_p_i        => trx0_clk_p_i,
     trx0_clk_n_i        => trx0_clk_n_i,
-    -- Output clock
-    trx0_clk_bufg_o     => trx0_clk_bufg_o,
+    -- Output clocks
+    trx0_clk_bufg_div_o => trx0_clk_bufg_div_o,
+    trx0_clk_bufr_o     => trx0_clk_bufr_o,
     -- Input clock from user design
     trx0_clk_i          => trx0_clk_i,
     -- Transmitter interface
@@ -221,8 +223,9 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     -- Input clock from FMC
     trx1_clk_p_i        => trx1_clk_p_i,
     trx1_clk_n_i        => trx1_clk_n_i,
-    -- Output clock
-    trx1_clk_bufg_o     => trx1_clk_bufg_o,
+    -- Output clocks
+    trx1_clk_bufg_div_o => trx1_clk_bufg_div_o,
+    trx1_clk_bufr_o     => trx1_clk_bufr_o,
     -- Input clock from user design
     trx1_clk_i          => trx1_clk_i,
     -- Transmitter interface
@@ -324,24 +327,24 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
   trx1_clk_p_i <= aclk_x;
   trx1_clk_n_i <= not aclk_x;
   
-  -- Global buffer clock fed back into core
-  trx0_clk_i <= trx0_clk_bufg_o;
-  trx1_clk_i <= trx1_clk_bufg_o;
+  -- Regional buffer clock fed back into core
+  trx0_clk_i <= trx0_clk_bufr_o;
+  trx1_clk_i <= trx1_clk_bufr_o;
   
   -- AXI slave
-  s00_axi_aclk <= aclk;
+  s00_axi_aclk <= trx0_clk_bufg_div_o;
   s00_axi_aresetn <= aresetn;
   
   -- AXI streaming slave
-  s00_axis_aclk <= aclk;
+  s00_axis_aclk <= trx0_clk_bufg_div_o;
   s00_axis_aresetn <= aresetn;
-  s01_axis_aclk <= aclk;
+  s01_axis_aclk <= trx1_clk_bufg_div_o;
   s01_axis_aresetn <= aresetn;
   
   -- AXI streaming master
-  m00_axis_aclk <= aclk;
+  m00_axis_aclk <= trx0_clk_bufg_div_o;
   m00_axis_aresetn <= aresetn;
-  m01_axis_aclk <= aclk;
+  m01_axis_aclk <= trx1_clk_bufg_div_o;
   m01_axis_aresetn <= aresetn;
   
   -----------------------------------------------------------------------
@@ -392,23 +395,6 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     end if;
   end process trx1_rxclk_gen;
 
-  -- AXI clock generator
-  clock_gen : process
-  begin
-    aclk <= '0';
-    if (end_of_simulation) then
-      wait;
-    else
-      wait for CLOCK_PERIOD;
-      loop
-        aclk <= '0';
-        wait for CLOCK_PERIOD/2;
-        aclk <= '1';
-        wait for CLOCK_PERIOD/2;
-      end loop;
-    end if;
-  end process clock_gen;
-
   -- Data clock generator (AXI clock x 4)
   clock_x_gen : process
   begin
@@ -436,7 +422,7 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     aresetn <= '0';
 
     -- Drive inputs T_HOLD time after rising edge of clock
-    wait until rising_edge(aclk);
+    wait until rising_edge(aclk_x);
     wait for T_HOLD;
 
     wait for T_RST;
