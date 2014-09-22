@@ -133,8 +133,8 @@ proc create_root_design { parentCell } {
   # Create interface ports
   set DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 DDR ]
   set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_processing_system7:fixedio_rtl:1.0 FIXED_IO ]
-  set iic_rtl [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 iic_rtl ]
-  set iic_rtl_0 [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 iic_rtl_0 ]
+  set trx0_iic [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 trx0_iic ]
+  set trx1_iic [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 trx1_iic ]
 
   # Create ports
   set trx0_clk_n_i [ create_bd_port -dir I trx0_clk_n_i ]
@@ -215,8 +215,8 @@ proc create_root_design { parentCell } {
   connect_bd_intf_net -intf_net axi_dma_1_M_AXI_MM2S [get_bd_intf_pins axi_dma_1/M_AXI_MM2S] [get_bd_intf_pins axi_mem_intercon/S04_AXI]
   connect_bd_intf_net -intf_net axi_dma_1_M_AXI_S2MM [get_bd_intf_pins axi_dma_1/M_AXI_S2MM] [get_bd_intf_pins axi_mem_intercon/S05_AXI]
   connect_bd_intf_net -intf_net axi_dma_1_M_AXI_SG [get_bd_intf_pins axi_dma_1/M_AXI_SG] [get_bd_intf_pins axi_mem_intercon/S03_AXI]
-  connect_bd_intf_net -intf_net axi_iic_0_IIC [get_bd_intf_ports iic_rtl] [get_bd_intf_pins axi_iic_0/IIC]
-  connect_bd_intf_net -intf_net axi_iic_1_IIC [get_bd_intf_ports iic_rtl_0] [get_bd_intf_pins axi_iic_1/IIC]
+  connect_bd_intf_net -intf_net axi_iic_0_IIC [get_bd_intf_ports trx0_iic] [get_bd_intf_pins axi_iic_0/IIC]
+  connect_bd_intf_net -intf_net axi_iic_1_IIC [get_bd_intf_ports trx1_iic] [get_bd_intf_pins axi_iic_1/IIC]
   connect_bd_intf_net -intf_net axi_mem_intercon_M00_AXI [get_bd_intf_pins axi_mem_intercon/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
   connect_bd_intf_net -intf_net axi_serdes_fmc_0_M00_AXIS [get_bd_intf_pins axi_dma_0/S_AXIS_S2MM] [get_bd_intf_pins axi_serdes_fmc_0/M00_AXIS]
   connect_bd_intf_net -intf_net axi_serdes_fmc_0_M01_AXIS [get_bd_intf_pins axi_dma_1/S_AXIS_S2MM] [get_bd_intf_pins axi_serdes_fmc_0/M01_AXIS]
