@@ -59,7 +59,7 @@ begin
   port map (
     CE  => '1',
     CLR => '0',
-    I   => clk_bufr,
+    I   => clk_ibufds,
     O   => clk_bufr_div
   );
   
