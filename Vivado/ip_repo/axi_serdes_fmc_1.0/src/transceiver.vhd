@@ -69,6 +69,7 @@ architecture transceiver_syn of transceiver is
 
   component tx_interface
   port (
+    rst_i          : in std_logic;
     -- Input ports
     txclk_i        : in std_logic;
     txdata_i       : in std_logic_vector(9 downto 0);
@@ -119,6 +120,7 @@ begin
   ----------------------------------------------------------------------------------------------------
   tx_interface_inst : tx_interface
   port map (
+    rst_i      => rst_i,
     txclk_i    => txclk_i,
     txdata_i   => txdata_i,
     txdata_p_o => txdata_p_o,

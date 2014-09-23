@@ -9,6 +9,7 @@ library unisim;
 
 entity tx_interface is
 port (
+  rst_i          : in std_logic;
   -- Input ports
   txclk_i        : in std_logic;
   txdata_i       : in std_logic_vector(9 downto 0);
@@ -22,11 +23,30 @@ end tx_interface;
 
 architecture tx_interface_syn of tx_interface is
 
+signal txdata_r0     : std_logic_vector(9 downto 0);
+signal txdata_r1     : std_logic_vector(9 downto 0);
+signal txdata_r2     : std_logic_vector(9 downto 0);
 signal txclk_ddr     : std_logic;
 signal txdata_ddr    : std_logic_vector(4 downto 0);
 
 begin
 
+  -- Pipelining the data to pass timing
+  process (txclk_i)
+	begin
+	  if rst_i = '1' then
+        txdata_r0 <= (others => '1');
+        txdata_r1 <= (others => '1');
+        txdata_r2 <= (others => '1');
+	  else  
+      if rising_edge(txclk_i) then 
+        txdata_r0 <= txdata_i;
+        txdata_r1 <= txdata_r0;
+        txdata_r2 <= txdata_r1;
+      end if;
+    end if;
+	end process;
+  
   ----------------------------------------------------------------------------------------------------
   -- Forwarded transmit clock
   ----------------------------------------------------------------------------------------------------
@@ -83,8 +103,8 @@ begin
       Q => txdata_ddr(i),
       C => txclk_i,
       CE => '1',
-      D1 => txdata_i(i),   -- Rising edge: Low nibble
-      D2 => txdata_i(i+5), -- Falling edge: High nibble
+      D1 => txdata_r2(i),   -- Rising edge: Low nibble
+      D2 => txdata_r2(i+5), -- Falling edge: High nibble
       R => '0',
       S => '0'
     );

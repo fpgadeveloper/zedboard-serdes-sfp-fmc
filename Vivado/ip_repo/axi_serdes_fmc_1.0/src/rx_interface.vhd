@@ -39,6 +39,9 @@ signal rxdata_ibufds : std_logic_vector(4 downto 0);
 signal rxdata_ddr    : std_logic_vector(4 downto 0);
 signal rxdata_delay  : std_logic_vector(4 downto 0);
 signal rxdata_sdr    : std_logic_vector(9 downto 0);
+signal rxdata_sdr_r0 : std_logic_vector(9 downto 0);
+signal rxdata_sdr_r1 : std_logic_vector(9 downto 0);
+signal rxdata_sdr_r2 : std_logic_vector(9 downto 0);
 
 begin
   ----------------------------------------------------------------------------------------------------
@@ -152,8 +155,24 @@ begin
 
   end generate;
   
+  -- Pipelining the data to pass timing
+  process (rxclk_bufr)
+	begin
+	  if rst_i = '1' then
+        rxdata_sdr_r0 <= (others => '1');
+        rxdata_sdr_r1 <= (others => '1');
+        rxdata_sdr_r2 <= (others => '1');
+	  else
+      if rising_edge(rxclk_bufr) then 
+        rxdata_sdr_r0 <= rxdata_sdr;
+        rxdata_sdr_r1 <= rxdata_sdr_r0;
+        rxdata_sdr_r2 <= rxdata_sdr_r1;
+      end if;
+    end if;
+	end process;
+	
 -- Assign outputs
 rxclk_o <= rxclk_bufr;
-rxdata_o <= rxdata_sdr;
+rxdata_o <= rxdata_sdr_r2;
 
 end rx_interface_syn;

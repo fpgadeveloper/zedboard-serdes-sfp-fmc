@@ -429,7 +429,7 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     aresetn <= '1';
     
     -- Send data 10 times
-    for cycle in 0 to 10 loop
+    for cycle in 0 to 20 loop
       s00_axis_tvalid  <= '1';
       s01_axis_tvalid  <= '1';
       -- Send 4 bytes on both transmitters
