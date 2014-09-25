@@ -6,7 +6,18 @@ use ieee.std_logic_unsigned.all;
 entity axi_serdes_fmc_v1_0 is
 	generic (
 		-- Users to add parameters here
-
+    TRX0_RXCLK_IDELAY      : integer := 0;
+    TRX0_RXDATA0_IDELAY    : integer := 15;
+    TRX0_RXDATA1_IDELAY    : integer := 15;
+    TRX0_RXDATA2_IDELAY    : integer := 15;
+    TRX0_RXDATA3_IDELAY    : integer := 15;
+    TRX0_RXDATA4_IDELAY    : integer := 15;
+    TRX1_RXCLK_IDELAY      : integer := 0;
+    TRX1_RXDATA0_IDELAY    : integer := 15;
+    TRX1_RXDATA1_IDELAY    : integer := 15;
+    TRX1_RXDATA2_IDELAY    : integer := 15;
+    TRX1_RXDATA3_IDELAY    : integer := 15;
+    TRX1_RXDATA4_IDELAY    : integer := 15;
 		-- User parameters ends
 		-- Do not modify the parameters beyond this line
 
@@ -223,7 +234,12 @@ architecture arch_imp of axi_serdes_fmc_v1_0 is
 
   component transceiver
   generic (
-      RXDATA_IDELAY : integer := 16
+      RXCLK_IDELAY   : integer := 15;
+      RXDATA0_IDELAY : integer := 15;
+      RXDATA1_IDELAY : integer := 15;
+      RXDATA2_IDELAY : integer := 15;
+      RXDATA3_IDELAY : integer := 15;
+      RXDATA4_IDELAY : integer := 15
   );
   port (
       rst_i          : in std_logic;
@@ -384,7 +400,12 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
 
   transceiver0_inst : transceiver
   generic map (
-    RXDATA_IDELAY => 0
+    RXCLK_IDELAY   => TRX0_RXCLK_IDELAY,
+    RXDATA0_IDELAY => TRX0_RXDATA0_IDELAY,
+    RXDATA1_IDELAY => TRX0_RXDATA1_IDELAY,
+    RXDATA2_IDELAY => TRX0_RXDATA2_IDELAY,
+    RXDATA3_IDELAY => TRX0_RXDATA3_IDELAY,
+    RXDATA4_IDELAY => TRX0_RXDATA4_IDELAY
   )
   port map (
     rst_i          => not s00_axi_aresetn, -- For IDELAY control
@@ -431,7 +452,12 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
   
   transceiver1_inst : transceiver
   generic map (
-    RXDATA_IDELAY => 0
+    RXCLK_IDELAY   => TRX1_RXCLK_IDELAY,
+    RXDATA0_IDELAY => TRX1_RXDATA0_IDELAY,
+    RXDATA1_IDELAY => TRX1_RXDATA1_IDELAY,
+    RXDATA2_IDELAY => TRX1_RXDATA2_IDELAY,
+    RXDATA3_IDELAY => TRX1_RXDATA3_IDELAY,
+    RXDATA4_IDELAY => TRX1_RXDATA4_IDELAY
   )
   port map (
     rst_i          => not s00_axi_aresetn, -- For IDELAY control

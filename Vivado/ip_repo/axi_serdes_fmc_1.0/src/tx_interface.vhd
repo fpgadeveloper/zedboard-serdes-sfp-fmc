@@ -34,16 +34,10 @@ begin
   -- Pipelining the data to pass timing
   process (txclk_i)
 	begin
-	  if rst_i = '1' then
-        txdata_r0 <= (others => '1');
-        txdata_r1 <= (others => '1');
-        txdata_r2 <= (others => '1');
-	  else  
-      if rising_edge(txclk_i) then 
-        txdata_r0 <= txdata_i;
-        txdata_r1 <= txdata_r0;
-        txdata_r2 <= txdata_r1;
-      end if;
+    if rising_edge(txclk_i) then 
+      txdata_r0 <= txdata_i;
+      txdata_r1 <= txdata_r0;
+      txdata_r2 <= txdata_r1;
     end if;
 	end process;
   

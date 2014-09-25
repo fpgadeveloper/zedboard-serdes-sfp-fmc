@@ -9,7 +9,12 @@ library unisim;
 
 entity transceiver is
 generic (
-    RXDATA_IDELAY : integer := 16
+    RXCLK_IDELAY   : integer := 15;
+    RXDATA0_IDELAY : integer := 15;
+    RXDATA1_IDELAY : integer := 15;
+    RXDATA2_IDELAY : integer := 15;
+    RXDATA3_IDELAY : integer := 15;
+    RXDATA4_IDELAY : integer := 15
 );
 port (
     rst_i          : in std_logic;
@@ -83,7 +88,12 @@ architecture transceiver_syn of transceiver is
 
   component rx_interface
   generic (
-    RXDATA_IDELAY : integer := 16
+    RXCLK_IDELAY   : integer := 15;
+    RXDATA0_IDELAY : integer := 15;
+    RXDATA1_IDELAY : integer := 15;
+    RXDATA2_IDELAY : integer := 15;
+    RXDATA3_IDELAY : integer := 15;
+    RXDATA4_IDELAY : integer := 15
   );
   port (
     rst_i          : in std_logic;
@@ -165,6 +175,14 @@ begin
   -- Receiver interface
   ----------------------------------------------------------------------------------------------------
   rx_interface_inst : rx_interface
+  generic map (
+    RXCLK_IDELAY    => RXCLK_IDELAY,
+    RXDATA0_IDELAY  => RXDATA0_IDELAY,
+    RXDATA1_IDELAY  => RXDATA1_IDELAY,
+    RXDATA2_IDELAY  => RXDATA2_IDELAY,
+    RXDATA3_IDELAY  => RXDATA3_IDELAY,
+    RXDATA4_IDELAY  => RXDATA4_IDELAY
+  )
   port map (
     rst_i          => rst_i,
     clk_i          => clk_i,
