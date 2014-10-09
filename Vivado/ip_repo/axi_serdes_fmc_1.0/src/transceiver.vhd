@@ -26,6 +26,8 @@ port (
     -- Output clocks
     clk_bufg_div_o : out std_logic;
     clk_bufr_o     : out std_logic;
+    -- Input clock from user design
+    clk_user_i     : in std_logic;
     -- Transmitter interface
     txclk_i        : in std_logic;
     txdata_i       : in std_logic_vector(9 downto 0);
@@ -66,6 +68,7 @@ architecture transceiver_syn of transceiver is
     -- Input clock
     clk_p_i        : in  std_logic;
     clk_n_i        : in  std_logic;
+    clk_user_i     : in std_logic;
     -- Output clock
     clk_bufg_div_o : out std_logic;
     clk_bufr_o     : out std_logic
@@ -121,6 +124,7 @@ begin
   port map (
     clk_p_i        => clk_p_i,
     clk_n_i        => clk_n_i,
+    clk_user_i     => clk_user_i,
     clk_bufg_div_o => clk_bufg_div_o,
     clk_bufr_o     => clk_bufr_o
   );

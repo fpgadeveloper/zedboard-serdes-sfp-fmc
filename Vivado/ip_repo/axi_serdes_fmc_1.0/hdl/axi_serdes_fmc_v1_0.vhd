@@ -2,6 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
+library UNISIM;
+use UNISIM.vcomponents.all;
 
 entity axi_serdes_fmc_v1_0 is
 	generic (
@@ -127,7 +129,6 @@ entity axi_serdes_fmc_v1_0 is
 		s00_axis_aresetn	: in std_logic;
 		s00_axis_tready	: out std_logic;
 		s00_axis_tdata	: in std_logic_vector(C_S00_AXIS_TDATA_WIDTH-1 downto 0);
-		s00_axis_tstrb	: in std_logic_vector((C_S00_AXIS_TDATA_WIDTH/8)-1 downto 0);
 		s00_axis_tlast	: in std_logic;
 		s00_axis_tvalid	: in std_logic;
 
@@ -136,7 +137,6 @@ entity axi_serdes_fmc_v1_0 is
 		m00_axis_aresetn	: in std_logic;
 		m00_axis_tvalid	: out std_logic;
 		m00_axis_tdata	: out std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0);
-		m00_axis_tstrb	: out std_logic_vector((C_M00_AXIS_TDATA_WIDTH/8)-1 downto 0);
 		m00_axis_tlast	: out std_logic;
 		m00_axis_tready	: in std_logic;
     
@@ -145,7 +145,6 @@ entity axi_serdes_fmc_v1_0 is
 		s01_axis_aresetn	: in std_logic;
 		s01_axis_tready	: out std_logic;
 		s01_axis_tdata	: in std_logic_vector(C_S00_AXIS_TDATA_WIDTH-1 downto 0);
-		s01_axis_tstrb	: in std_logic_vector((C_S00_AXIS_TDATA_WIDTH/8)-1 downto 0);
 		s01_axis_tlast	: in std_logic;
 		s01_axis_tvalid	: in std_logic;
 
@@ -154,7 +153,6 @@ entity axi_serdes_fmc_v1_0 is
 		m01_axis_aresetn	: in std_logic;
 		m01_axis_tvalid	: out std_logic;
 		m01_axis_tdata	: out std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0);
-		m01_axis_tstrb	: out std_logic_vector((C_M00_AXIS_TDATA_WIDTH/8)-1 downto 0);
 		m01_axis_tlast	: out std_logic;
 		m01_axis_tready	: in std_logic
 	);
@@ -169,6 +167,34 @@ architecture arch_imp of axi_serdes_fmc_v1_0 is
 		C_S_AXI_ADDR_WIDTH	: integer	:= 4
 		);
 		port (
+    -- Transceiver 0
+    -- Transmitter control
+    trx0_txrst_o        : out std_logic;
+    trx0_txdcbal_o      : out std_logic;
+    trx0_txlock_i       : in std_logic;
+    -- IODELAY control signals
+    trx0_iodelay_inc_o  : out std_logic;
+    trx0_iodelay_dec_o  : out std_logic;
+    -- Receiver control
+    trx0_rxrst_o        : out std_logic;
+    trx0_rxdcbal_o      : out std_logic;
+    trx0_rxlock_i       : in std_logic;
+    -- Internal loopback control
+    trx0_loopback_o     : out std_logic;
+    -- Transceiver 1
+    -- Transmitter control
+    trx1_txrst_o        : out std_logic;
+    trx1_txdcbal_o      : out std_logic;
+    trx1_txlock_i       : in std_logic;
+    -- IODELAY control signals
+    trx1_iodelay_inc_o  : out std_logic;
+    trx1_iodelay_dec_o  : out std_logic;
+    -- Receiver control
+    trx1_rxrst_o        : out std_logic;
+    trx1_rxdcbal_o      : out std_logic;
+    trx1_rxlock_i       : in std_logic;
+    -- Internal loopback control
+    trx1_loopback_o     : out std_logic;
 		S_AXI_ACLK	: in std_logic;
 		S_AXI_ARESETN	: in std_logic;
 		S_AXI_AWADDR	: in std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
@@ -201,12 +227,12 @@ architecture arch_imp of axi_serdes_fmc_v1_0 is
     -- Ten-bit interface to drive transceiver block
     txclk_i        : in std_logic;
     txdata_o       : out std_logic_vector(9 downto 0);
+    txlock_i       : in std_logic;
     -- AXI streaming slave interface
 		S_AXIS_ACLK	: in std_logic;
 		S_AXIS_ARESETN	: in std_logic;
 		S_AXIS_TREADY	: out std_logic;
 		S_AXIS_TDATA	: in std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
-		S_AXIS_TSTRB	: in std_logic_vector((C_S_AXIS_TDATA_WIDTH/8)-1 downto 0);
 		S_AXIS_TLAST	: in std_logic;
 		S_AXIS_TVALID	: in std_logic
 		);
@@ -221,12 +247,12 @@ architecture arch_imp of axi_serdes_fmc_v1_0 is
     -- Ten-bit interface from transceiver block
     rxclk_i        : in std_logic;
     rxdata_i       : in std_logic_vector(9 downto 0);
+    rxlock_i       : in std_logic;
     -- AXI streaming master interface
 		M_AXIS_ACLK	: in std_logic;
 		M_AXIS_ARESETN	: in std_logic;
 		M_AXIS_TVALID	: out std_logic;
 		M_AXIS_TDATA	: out std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
-		M_AXIS_TSTRB	: out std_logic_vector((C_M_AXIS_TDATA_WIDTH/8)-1 downto 0);
 		M_AXIS_TLAST	: out std_logic;
 		M_AXIS_TREADY	: in std_logic
 		);
@@ -251,6 +277,8 @@ architecture arch_imp of axi_serdes_fmc_v1_0 is
       -- Output clocks
       clk_bufg_div_o : out std_logic;
       clk_bufr_o     : out std_logic;
+      -- Input clock from user design
+      clk_user_i     : in std_logic;
       -- Transmitter interface
       txclk_i        : in std_logic;
       txdata_i       : in std_logic_vector(9 downto 0);
@@ -294,6 +322,45 @@ architecture arch_imp of axi_serdes_fmc_v1_0 is
   signal trx1_rxclk    : std_logic;
   signal trx1_rxdata   : std_logic_vector(9 downto 0);
   
+  -- Slave register signals
+  signal trx0_txrst_r        : std_logic;
+  signal trx0_txdcbal_r      : std_logic;
+  signal trx0_txlock_r       : std_logic;
+  signal trx0_iodelay_inc_r  : std_logic;
+  signal trx0_iodelay_dec_r  : std_logic;
+  signal trx0_rxrst_r        : std_logic;
+  signal trx0_rxdcbal_r      : std_logic;
+  signal trx0_rxlock_r       : std_logic;
+  signal trx0_loopback_r     : std_logic;
+  signal trx1_txrst_r        : std_logic;
+  signal trx1_txdcbal_r      : std_logic;
+  signal trx1_txlock_r       : std_logic;
+  signal trx1_iodelay_inc_r  : std_logic;
+  signal trx1_iodelay_dec_r  : std_logic;
+  signal trx1_rxrst_r        : std_logic;
+  signal trx1_rxdcbal_r      : std_logic;
+  signal trx1_rxlock_r       : std_logic;
+  signal trx1_loopback_r     : std_logic;
+  
+  -- Loopback interface mux signals
+  signal m00_axis_aresetn_rx : std_logic;
+	signal m00_axis_tvalid_rx : std_logic;
+	signal m00_axis_tdata_rx  : std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0);
+	signal m00_axis_tlast_rx  : std_logic;
+  signal m00_axis_aresetn_lb : std_logic;
+	signal m00_axis_tvalid_lb : std_logic;
+	signal m00_axis_tdata_lb  : std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0);
+	signal m00_axis_tlast_lb  : std_logic;
+  
+  signal m01_axis_aresetn_rx : std_logic;
+	signal m01_axis_tvalid_rx : std_logic;
+	signal m01_axis_tdata_rx  : std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0);
+	signal m01_axis_tlast_rx  : std_logic;
+  signal m01_axis_aresetn_lb : std_logic;
+	signal m01_axis_tvalid_lb : std_logic;
+	signal m01_axis_tdata_lb  : std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0);
+	signal m01_axis_tlast_lb  : std_logic;
+  
 begin
 
 -- Instantiation of Axi Bus Interface S00_AXI
@@ -303,6 +370,34 @@ axi_serdes_fmc_v1_0_S00_AXI_inst : axi_serdes_fmc_v1_0_S00_AXI
 		C_S_AXI_ADDR_WIDTH	=> C_S00_AXI_ADDR_WIDTH
 	)
 	port map (
+    -- Transceiver 0
+    -- Transmitter control
+    trx0_txrst_o        => trx0_txrst_r,
+    trx0_txdcbal_o      => trx0_txdcbal_r,
+    trx0_txlock_i       => trx0_txlock_r,
+    -- IODELAY control signals
+    trx0_iodelay_inc_o  => trx0_iodelay_inc_r,
+    trx0_iodelay_dec_o  => trx0_iodelay_dec_r,
+    -- Receiver control
+    trx0_rxrst_o        => trx0_rxrst_r,
+    trx0_rxdcbal_o      => trx0_rxdcbal_r,
+    trx0_rxlock_i       => trx0_rxlock_r,
+    -- Internal loopback control
+    trx0_loopback_o     => trx0_loopback_r,
+    -- Transceiver 1
+    -- Transmitter control
+    trx1_txrst_o        => trx1_txrst_r,
+    trx1_txdcbal_o      => trx1_txdcbal_r,
+    trx1_txlock_i       => trx1_txlock_r,
+    -- IODELAY control signals
+    trx1_iodelay_inc_o  => trx1_iodelay_inc_r,
+    trx1_iodelay_dec_o  => trx1_iodelay_dec_r,
+    -- Receiver control
+    trx1_rxrst_o        => trx1_rxrst_r,
+    trx1_rxdcbal_o      => trx1_rxdcbal_r,
+    trx1_rxlock_i       => trx1_rxlock_r,
+    -- Internal loopback control
+    trx1_loopback_o     => trx1_loopback_r,
 		S_AXI_ACLK	=> s00_axi_aclk,
 		S_AXI_ARESETN	=> s00_axi_aresetn,
 		S_AXI_AWADDR	=> s00_axi_awaddr,
@@ -334,11 +429,11 @@ axi_serdes_fmc_v1_0_S00_AXIS_inst : axi_serdes_fmc_v1_0_S00_AXIS
 	port map (
     txclk_i        => trx0_clk_i,  -- clocked by global transceiver clock
     txdata_o       => trx0_txdata,
+    txlock_i       => trx0_txlock_r,
 		S_AXIS_ACLK	=> s00_axis_aclk,
 		S_AXIS_ARESETN	=> s00_axis_aresetn,
 		S_AXIS_TREADY	=> s00_axis_tready,
 		S_AXIS_TDATA	=> s00_axis_tdata,
-		S_AXIS_TSTRB	=> s00_axis_tstrb,
 		S_AXIS_TLAST	=> s00_axis_tlast,
 		S_AXIS_TVALID	=> s00_axis_tvalid
 	);
@@ -352,15 +447,40 @@ axi_serdes_fmc_v1_0_M00_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
 	port map (
     rxclk_i        => trx0_rxclk,  -- clocked by received clock
     rxdata_i       => trx0_rxdata,
+    rxlock_i       => trx0_rxlock_r,
 		M_AXIS_ACLK	=> m00_axis_aclk,
-		M_AXIS_ARESETN	=> m00_axis_aresetn,
-		M_AXIS_TVALID	=> m00_axis_tvalid,
-		M_AXIS_TDATA	=> m00_axis_tdata,
-		M_AXIS_TSTRB	=> m00_axis_tstrb,
-		M_AXIS_TLAST	=> m00_axis_tlast,
+		M_AXIS_ARESETN	=> m00_axis_aresetn_rx,
+		M_AXIS_TVALID	=> m00_axis_tvalid_rx,
+		M_AXIS_TDATA	=> m00_axis_tdata_rx,
+		M_AXIS_TLAST	=> m00_axis_tlast_rx,
 		M_AXIS_TREADY	=> m00_axis_tready
 	);
 
+-- Internal Loopback Interface for M00_AXIS
+loopback_M00_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
+	generic map (
+		C_M_AXIS_TDATA_WIDTH	=> C_M00_AXIS_TDATA_WIDTH,
+		C_M_START_COUNT	=> C_M00_AXIS_START_COUNT
+	)
+	port map (
+    rxclk_i        => trx0_clk_i,  -- clocked by global transceiver clock
+    rxdata_i       => trx0_txdata,
+    rxlock_i       => trx0_rxlock_r,
+		M_AXIS_ACLK	=> m00_axis_aclk,
+		M_AXIS_ARESETN	=> m00_axis_aresetn_lb,
+		M_AXIS_TVALID	=> m00_axis_tvalid_lb,
+		M_AXIS_TDATA	=> m00_axis_tdata_lb,
+		M_AXIS_TLAST	=> m00_axis_tlast_lb,
+		M_AXIS_TREADY	=> m00_axis_tready
+	);
+
+  -- Loopback mux
+  m00_axis_aresetn_rx <= m00_axis_aresetn and not trx0_loopback_r;
+  m00_axis_aresetn_lb <= m00_axis_aresetn and trx0_loopback_r;
+  m00_axis_tvalid <= m00_axis_tvalid_rx when trx0_loopback_r = '0' else m00_axis_tvalid_lb;
+  m00_axis_tdata  <= m00_axis_tdata_rx  when trx0_loopback_r = '0' else m00_axis_tdata_lb;
+  m00_axis_tlast  <= m00_axis_tlast_rx  when trx0_loopback_r = '0' else m00_axis_tlast_lb;
+  
 -- Instantiation of Axi Bus Interface S01_AXIS
 axi_serdes_fmc_v1_0_S01_AXIS_inst : axi_serdes_fmc_v1_0_S00_AXIS
 	generic map (
@@ -369,11 +489,11 @@ axi_serdes_fmc_v1_0_S01_AXIS_inst : axi_serdes_fmc_v1_0_S00_AXIS
 	port map (
     txclk_i        => trx1_clk_i,  -- clocked by global transceiver clock
     txdata_o       => trx1_txdata,
+    txlock_i       => trx1_txlock_r,
 		S_AXIS_ACLK	   => s01_axis_aclk,
 		S_AXIS_ARESETN => s01_axis_aresetn,
 		S_AXIS_TREADY	 => s01_axis_tready,
 		S_AXIS_TDATA	 => s01_axis_tdata,
-		S_AXIS_TSTRB	 => s01_axis_tstrb,
 		S_AXIS_TLAST	 => s01_axis_tlast,
 		S_AXIS_TVALID	 => s01_axis_tvalid
 	);
@@ -387,15 +507,40 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
 	port map (
     rxclk_i        => trx1_rxclk,  -- clocked by received clock
     rxdata_i       => trx1_rxdata,
+    rxlock_i       => trx1_rxlock_r,
 		M_AXIS_ACLK	   => m01_axis_aclk,
-		M_AXIS_ARESETN => m01_axis_aresetn,
-		M_AXIS_TVALID	 => m01_axis_tvalid,
-		M_AXIS_TDATA	 => m01_axis_tdata,
-		M_AXIS_TSTRB	 => m01_axis_tstrb,
-		M_AXIS_TLAST	 => m01_axis_tlast,
+		M_AXIS_ARESETN => m01_axis_aresetn_rx,
+		M_AXIS_TVALID	 => m01_axis_tvalid_rx,
+		M_AXIS_TDATA	 => m01_axis_tdata_rx,
+		M_AXIS_TLAST	 => m01_axis_tlast_rx,
 		M_AXIS_TREADY	 => m01_axis_tready
 	);
 
+-- Internal Loopback Interface for M01_AXIS
+loopback_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
+	generic map (
+		C_M_AXIS_TDATA_WIDTH	=> C_M00_AXIS_TDATA_WIDTH,
+		C_M_START_COUNT	=> C_M00_AXIS_START_COUNT
+	)
+	port map (
+    rxclk_i        => trx1_clk_i,  -- clocked by global transceiver clock
+    rxdata_i       => trx1_txdata,
+    rxlock_i       => trx1_rxlock_r,
+		M_AXIS_ACLK	=> m01_axis_aclk,
+		M_AXIS_ARESETN	=> m01_axis_aresetn_lb,
+		M_AXIS_TVALID	=> m01_axis_tvalid_lb,
+		M_AXIS_TDATA	=> m01_axis_tdata_lb,
+		M_AXIS_TLAST	=> m01_axis_tlast_lb,
+		M_AXIS_TREADY	=> m01_axis_tready
+	);
+
+  -- Loopback mux
+  m01_axis_aresetn_rx <= m01_axis_aresetn and not trx1_loopback_r;
+  m01_axis_aresetn_lb <= m01_axis_aresetn and trx1_loopback_r;
+  m01_axis_tvalid <= m01_axis_tvalid_rx when trx1_loopback_r = '0' else m01_axis_tvalid_lb;
+  m01_axis_tdata  <= m01_axis_tdata_rx  when trx1_loopback_r = '0' else m01_axis_tdata_lb;
+  m01_axis_tlast  <= m01_axis_tlast_rx  when trx1_loopback_r = '0' else m01_axis_tlast_lb;
+  
 	-- Add user logic here
 
   transceiver0_inst : transceiver
@@ -417,23 +562,25 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     -- Output clocks
     clk_bufg_div_o => trx0_clk_bufg_div_o,
     clk_bufr_o     => trx0_clk_bufr_o,
+    -- Input clock from user design
+    clk_user_i     => trx0_clk_i,
     -- Transmitter interface
-    txclk_i        => trx0_clk_i,  -- clocked by global transceiver clock
+    txclk_i        => trx0_clk_i,  -- clocked by user clock
     txdata_i       => trx0_txdata, -- from AXIS slave
     txdata_p_o     => trx0_txdata_p_o,
     txdata_n_o     => trx0_txdata_n_o,
     txclk_p_o      => trx0_txclk_p_o,
     txclk_n_o      => trx0_txclk_n_o,
     -- Transmitter control
-    txrst_i        => '0', -- from registers
+    txrst_i        => trx0_txrst_r, -- from registers
     txrst_o        => trx0_txrst_o,
-    txdcbal_i      => '0', -- from registers
+    txdcbal_i      => trx0_txdcbal_r, -- from registers
     txdcbal_o      => trx0_txdcbal_o,
     txlock_i       => trx0_txlock_i,
-    txlock_o       => open, -- from registers
+    txlock_o       => trx0_txlock_r, -- from registers
     -- Receiver interface
-    iodelay_inc_i  => '0', -- from registers
-    iodelay_dec_i  => '0', -- from registers
+    iodelay_inc_i  => trx0_iodelay_inc_r, -- from registers
+    iodelay_dec_i  => trx0_iodelay_dec_r, -- from registers
     rxdata_p_i     => trx0_rxdata_p_i,
     rxdata_n_i     => trx0_rxdata_n_i,
     rxclk_p_i      => trx0_rxclk_p_i,
@@ -441,12 +588,12 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     rxclk_o        => trx0_rxclk, -- to AXIS master
     rxdata_o       => trx0_rxdata, -- to AXIS master
     -- Receiver control
-    rxrst_i        => '0', -- from registers
+    rxrst_i        => trx0_rxrst_r, -- from registers
     rxrst_o        => trx0_rxrst_o,
-    rxdcbal_i      => '0', -- from registers
+    rxdcbal_i      => trx0_rxdcbal_r, -- from registers
     rxdcbal_o      => trx0_rxdcbal_o,
     rxlock_i       => trx0_rxlock_i,
-    rxlock_o       => open -- from registers
+    rxlock_o       => trx0_rxlock_r -- from registers
   );
   
   
@@ -469,23 +616,25 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     -- Output clocks
     clk_bufg_div_o => trx1_clk_bufg_div_o,
     clk_bufr_o     => trx1_clk_bufr_o,
+    -- Input clock from user design
+    clk_user_i     => trx1_clk_i,
     -- Transmitter interface
-    txclk_i        => trx1_clk_i,  -- clocked by global transceiver clock
+    txclk_i        => trx1_clk_i,  -- clocked by user clock
     txdata_i       => trx1_txdata, -- from AXIS slave
     txdata_p_o     => trx1_txdata_p_o,
     txdata_n_o     => trx1_txdata_n_o,
     txclk_p_o      => trx1_txclk_p_o,
     txclk_n_o      => trx1_txclk_n_o,
     -- Transmitter control
-    txrst_i        => '0', -- from registers
+    txrst_i        => trx1_txrst_r, -- from registers
     txrst_o        => trx1_txrst_o,
-    txdcbal_i      => '0', -- from registers
+    txdcbal_i      => trx1_txdcbal_r, -- from registers
     txdcbal_o      => trx1_txdcbal_o,
     txlock_i       => trx1_txlock_i,
-    txlock_o       => open, -- from registers
+    txlock_o       => trx1_txlock_r, -- from registers
     -- Receiver interface
-    iodelay_inc_i  => '0', -- from registers
-    iodelay_dec_i  => '0', -- from registers
+    iodelay_inc_i  => trx1_iodelay_inc_r, -- from registers
+    iodelay_dec_i  => trx1_iodelay_dec_r, -- from registers
     rxdata_p_i     => trx1_rxdata_p_i,
     rxdata_n_i     => trx1_rxdata_n_i,
     rxclk_p_i      => trx1_rxclk_p_i,
@@ -493,14 +642,15 @@ axi_serdes_fmc_v1_0_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     rxclk_o        => trx1_rxclk, -- to AXIS master
     rxdata_o       => trx1_rxdata, -- to AXIS master
     -- Receiver control
-    rxrst_i        => '0', -- from registers
+    rxrst_i        => trx1_rxrst_r, -- from registers
     rxrst_o        => trx1_rxrst_o,
-    rxdcbal_i      => '0', -- from registers
+    rxdcbal_i      => trx1_rxdcbal_r, -- from registers
     rxdcbal_o      => trx1_rxdcbal_o,
     rxlock_i       => trx1_rxlock_i,
-    rxlock_o       => open -- from registers
+    rxlock_o       => trx1_rxlock_r -- from registers
   );
 
+  
 	-- User logic ends
 
 end arch_imp;

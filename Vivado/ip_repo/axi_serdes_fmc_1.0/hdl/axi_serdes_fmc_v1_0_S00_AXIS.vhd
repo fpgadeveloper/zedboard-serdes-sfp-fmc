@@ -17,6 +17,7 @@ entity axi_serdes_fmc_v1_0_S00_AXIS is
 		-- Users to add ports here
     txclk_i        : in std_logic;
     txdata_o       : out std_logic_vector(9 downto 0);
+    txlock_i       : in std_logic;
 
 		-- User ports ends
 		-- Do not modify the ports beyond this line
@@ -29,8 +30,6 @@ entity axi_serdes_fmc_v1_0_S00_AXIS is
 		S_AXIS_TREADY	: out std_logic;
 		-- Data in
 		S_AXIS_TDATA	: in std_logic_vector(C_S_AXIS_TDATA_WIDTH-1 downto 0);
-		-- Byte qualifier
-		S_AXIS_TSTRB	: in std_logic_vector((C_S_AXIS_TDATA_WIDTH/8)-1 downto 0);
 		-- Indicates boundary of last packet
 		S_AXIS_TLAST	: in std_logic;
 		-- Data is in valid
@@ -58,10 +57,15 @@ architecture arch_imp of axi_serdes_fmc_v1_0_S00_AXIS is
 
   signal rst     : std_logic;
   signal valid_n : std_logic;
+  signal full    : std_logic;
+  signal rd_en   : std_logic;
   
 begin
   -- Invert the AXI reset signal
   rst <= not S_AXIS_ARESETN;
+  
+  -- Allow reads when transmit lock is achieved
+  rd_en <= not txlock_i;
   
   fifo_32bit_to_8bit_inst : fifo_32bit_to_8bit
   port map (
@@ -76,10 +80,10 @@ begin
     din(23 downto 16) => S_AXIS_TDATA(15 downto 8),
     din(31 downto 24) => S_AXIS_TDATA(7 downto 0),
     wr_en  => S_AXIS_TVALID,
-    rd_en  => '1',  -- Always read from FIFO
+    rd_en  => rd_en,
     dout(7 downto 4) => txdata_o(8 downto 5),
     dout(3 downto 0) => txdata_o(3 downto 0),
-    full   => open,
+    full   => full,
     empty  => open,
     valid  => valid_n
   );
@@ -88,5 +92,7 @@ begin
   -- (applies when using DC balanced encoding)
   txdata_o(4) <= valid_n;
   txdata_o(9) <= valid_n;
+  
+  S_AXIS_TREADY <= not full;
   
 end arch_imp;

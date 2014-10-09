@@ -19,6 +19,7 @@ entity axi_serdes_fmc_v1_0_M00_AXIS is
 		-- Users to add ports here
     rxclk_i         : in std_logic;
     rxdata_i        : in std_logic_vector(9 downto 0);
+    rxlock_i        : in std_logic;
 		-- User ports ends
 		-- Do not modify the ports beyond this line
 
@@ -30,8 +31,6 @@ entity axi_serdes_fmc_v1_0_M00_AXIS is
 		M_AXIS_TVALID	: out std_logic;
 		-- TDATA is the primary payload that is used to provide the data that is passing across the interface from the master.
 		M_AXIS_TDATA	: out std_logic_vector(C_M_AXIS_TDATA_WIDTH-1 downto 0);
-		-- TSTRB is the byte qualifier that indicates whether the content of the associated byte of TDATA is processed as a data byte or a position byte.
-		M_AXIS_TSTRB	: out std_logic_vector((C_M_AXIS_TDATA_WIDTH/8)-1 downto 0);
 		-- TLAST indicates the boundary of a packet.
 		M_AXIS_TLAST	: out std_logic;
 		-- TREADY indicates that the slave can accept a transfer in the current cycle.
@@ -52,6 +51,7 @@ architecture implementation of axi_serdes_fmc_v1_0_M00_AXIS is
       rd_en : in std_logic;
       dout : out std_logic_vector(31 downto 0);
       full : out std_logic;
+      almost_empty : out std_logic;
       empty : out std_logic;
       valid : out std_logic
     );
@@ -59,6 +59,8 @@ architecture implementation of axi_serdes_fmc_v1_0_M00_AXIS is
 
   signal rst     : std_logic;
   signal wr_en   : std_logic;
+  signal almost_empty : std_logic;
+  signal empty : std_logic;
 
 begin
   ------------------------------------------------------------------
@@ -72,11 +74,11 @@ begin
 
   -- Invert the AXI reset signal
   rst <= not M_AXIS_ARESETN;
-  
+
   -- FIFO write enable:
   -- rxdata_i 5th and 10th bits are VALID_N signals from deserializer
   -- (applies when using DC balanced encoding)
-  wr_en <= not rxdata_i(9);
+  wr_en <= (not rxlock_i) and (not rxdata_i(9));
 
   fifo_8bit_to_32bit_inst : fifo_8bit_to_32bit
   PORT MAP (
@@ -85,7 +87,7 @@ begin
     rd_clk => M_AXIS_ACLK,  -- AXIS clock = Global clock / 4
     din    => rxdata_i(8 downto 5) & rxdata_i(3 downto 0),
     wr_en  => wr_en,
-    rd_en  => '1',  -- Always read from FIFO
+    rd_en  => M_AXIS_TREADY,  -- Always read from FIFO
     -- We reverse the byte order at the output of the FIFO
     -- so that the correct 32-bit word is output to AXI bus
     -- (the transmit interface reverses the byte order)
@@ -94,9 +96,11 @@ begin
     dout(23 downto 16) => M_AXIS_TDATA(15 downto 8),
     dout(31 downto 24) => M_AXIS_TDATA(7 downto 0),
     full   => open,
-    empty  => open,
+    almost_empty => almost_empty,
+    empty  => empty,
     valid  => M_AXIS_TVALID
   );
 
+  M_AXIS_TLAST <= almost_empty and not empty;
 
 end implementation;

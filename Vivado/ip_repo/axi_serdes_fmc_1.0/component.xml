@@ -656,7 +656,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>9cc5fd3c</spirit:value>
+            <spirit:value>2922a40c</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -672,7 +672,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>9cc5fd3c</spirit:value>
+            <spirit:value>2922a40c</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -1586,23 +1586,6 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>m00_axis_tstrb</spirit:name>
-        <spirit:wire>
-          <spirit:direction>out</spirit:direction>
-          <spirit:vector>
-            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="((spirit:decode(id(&apos;MODELPARAM_VALUE.C_M00_AXIS_TDATA_WIDTH&apos;)) / 8) - 1)">3</spirit:left>
-            <spirit:right spirit:format="long" spirit:resolve="immediate">0</spirit:right>
-          </spirit:vector>
-          <spirit:wireTypeDefs>
-            <spirit:wireTypeDef>
-              <spirit:typeName>std_logic_vector</spirit:typeName>
-              <spirit:viewNameRef>xilinx_vhdlsynthesis</spirit:viewNameRef>
-              <spirit:viewNameRef>xilinx_vhdlbehavioralsimulation</spirit:viewNameRef>
-            </spirit:wireTypeDef>
-          </spirit:wireTypeDefs>
-        </spirit:wire>
-      </spirit:port>
-      <spirit:port>
         <spirit:name>m00_axis_tlast</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
@@ -1698,23 +1681,6 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>s01_axis_tstrb</spirit:name>
-        <spirit:wire>
-          <spirit:direction>in</spirit:direction>
-          <spirit:vector>
-            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="((spirit:decode(id(&apos;MODELPARAM_VALUE.C_S00_AXIS_TDATA_WIDTH&apos;)) / 8) - 1)">3</spirit:left>
-            <spirit:right spirit:format="long" spirit:resolve="immediate">0</spirit:right>
-          </spirit:vector>
-          <spirit:wireTypeDefs>
-            <spirit:wireTypeDef>
-              <spirit:typeName>std_logic_vector</spirit:typeName>
-              <spirit:viewNameRef>xilinx_vhdlsynthesis</spirit:viewNameRef>
-              <spirit:viewNameRef>xilinx_vhdlbehavioralsimulation</spirit:viewNameRef>
-            </spirit:wireTypeDef>
-          </spirit:wireTypeDefs>
-        </spirit:wire>
-      </spirit:port>
-      <spirit:port>
         <spirit:name>s01_axis_tlast</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
@@ -1797,23 +1763,6 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>m01_axis_tstrb</spirit:name>
-        <spirit:wire>
-          <spirit:direction>out</spirit:direction>
-          <spirit:vector>
-            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="((spirit:decode(id(&apos;MODELPARAM_VALUE.C_M00_AXIS_TDATA_WIDTH&apos;)) / 8) - 1)">3</spirit:left>
-            <spirit:right spirit:format="long" spirit:resolve="immediate">0</spirit:right>
-          </spirit:vector>
-          <spirit:wireTypeDefs>
-            <spirit:wireTypeDef>
-              <spirit:typeName>std_logic_vector</spirit:typeName>
-              <spirit:viewNameRef>xilinx_vhdlsynthesis</spirit:viewNameRef>
-              <spirit:viewNameRef>xilinx_vhdlbehavioralsimulation</spirit:viewNameRef>
-            </spirit:wireTypeDef>
-          </spirit:wireTypeDefs>
-        </spirit:wire>
-      </spirit:port>
-      <spirit:port>
         <spirit:name>m01_axis_tlast</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
@@ -1871,23 +1820,6 @@
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
             <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_S00_AXIS_TDATA_WIDTH&apos;)) - 1)">31</spirit:left>
-            <spirit:right spirit:format="long" spirit:resolve="immediate">0</spirit:right>
-          </spirit:vector>
-          <spirit:wireTypeDefs>
-            <spirit:wireTypeDef>
-              <spirit:typeName>std_logic_vector</spirit:typeName>
-              <spirit:viewNameRef>xilinx_vhdlsynthesis</spirit:viewNameRef>
-              <spirit:viewNameRef>xilinx_vhdlbehavioralsimulation</spirit:viewNameRef>
-            </spirit:wireTypeDef>
-          </spirit:wireTypeDefs>
-        </spirit:wire>
-      </spirit:port>
-      <spirit:port>
-        <spirit:name>s00_axis_tstrb</spirit:name>
-        <spirit:wire>
-          <spirit:direction>in</spirit:direction>
-          <spirit:vector>
-            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="((spirit:decode(id(&apos;MODELPARAM_VALUE.C_S00_AXIS_TDATA_WIDTH&apos;)) / 8) - 1)">3</spirit:left>
             <spirit:right spirit:format="long" spirit:resolve="immediate">0</spirit:right>
           </spirit:vector>
           <spirit:wireTypeDefs>
@@ -1999,7 +1931,7 @@
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>TRX0_RXCLK_IDELAY</spirit:name>
         <spirit:displayName>Trx0 Rxclk Idelay</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.TRX0_RXCLK_IDELAY">15</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.TRX0_RXCLK_IDELAY">0</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>TRX0_RXDATA0_IDELAY</spirit:name>
@@ -2029,7 +1961,7 @@
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>TRX1_RXCLK_IDELAY</spirit:name>
         <spirit:displayName>Trx1 Rxclk Idelay</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.TRX1_RXCLK_IDELAY">15</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.TRX1_RXCLK_IDELAY">0</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>TRX1_RXDATA0_IDELAY</spirit:name>
@@ -2131,7 +2063,7 @@
       <spirit:file>
         <spirit:name>hdl/axi_serdes_fmc_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_fa18dc91</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_6fe929c1</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -2320,7 +2252,7 @@
     <spirit:parameter>
       <spirit:name>TRX0_RXCLK_IDELAY</spirit:name>
       <spirit:displayName>Trx0 Rxclk Idelay</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.TRX0_RXCLK_IDELAY">15</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.TRX0_RXCLK_IDELAY">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>TRX0_RXDATA0_IDELAY</spirit:name>
@@ -2350,7 +2282,7 @@
     <spirit:parameter>
       <spirit:name>TRX1_RXCLK_IDELAY</spirit:name>
       <spirit:displayName>Trx1 Rxclk Idelay</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.TRX1_RXCLK_IDELAY">15</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.TRX1_RXCLK_IDELAY">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>TRX1_RXDATA0_IDELAY</spirit:name>
@@ -2387,8 +2319,8 @@
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
       <xilinx:displayName>axi_serdes_fmc_v1.0</xilinx:displayName>
-      <xilinx:coreRevision>23</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2014-09-25T16:52:05Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>33</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2014-10-09T01:52:07Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="xilinx.com:user:axi_serdes_fmc:1.0_ARCHIVE_LOCATION">E:/Github/fpgadeveloper/zedboard-serdes-sfp-fmc/Vivado/ip_repo/axi_serdes_fmc_1.0</xilinx:tag>
         <xilinx:tag xilinx:name="opsero.com:user:axi_serdes_fmc:1.0_ARCHIVE_LOCATION">E:/Github/fpgadeveloper/zedboard-serdes-sfp-fmc/Vivado/ip_repo/axi_serdes_fmc_1.0</xilinx:tag>
@@ -2398,10 +2330,10 @@
       <xilinx:xilinxVersion>2014.2</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="0d6b1414"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="cafe3ba6"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="8fee977b"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="d60c4520"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="859b7164"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="7020b8f5"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="e7c87b17"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="fe14a8f8"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="0d748eb3"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="871c7222"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

@@ -136,7 +136,6 @@ architecture tb of tb_loopback is
 	signal s00_axis_aresetn	: std_logic := '0';
 	signal s00_axis_tready	: std_logic := '0';
 	signal s00_axis_tdata	  : std_logic_vector(C_S00_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
-	signal s00_axis_tstrb	  : std_logic_vector((C_S00_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
 	signal s00_axis_tlast	  : std_logic := '0';
 	signal s00_axis_tvalid	: std_logic := '0';
 
@@ -145,7 +144,6 @@ architecture tb of tb_loopback is
 	signal m00_axis_aresetn	: std_logic := '0';
 	signal m00_axis_tvalid	: std_logic := '0';
 	signal m00_axis_tdata	  : std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
-	signal m00_axis_tstrb	  : std_logic_vector((C_M00_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
 	signal m00_axis_tlast	  : std_logic := '0';
 	signal m00_axis_tready	: std_logic := '0';
   
@@ -154,7 +152,6 @@ architecture tb of tb_loopback is
 	signal s01_axis_aresetn	: std_logic := '0';
 	signal s01_axis_tready	: std_logic := '0';
 	signal s01_axis_tdata	  : std_logic_vector(C_S00_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
-	signal s01_axis_tstrb	  : std_logic_vector((C_S00_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
 	signal s01_axis_tlast	  : std_logic := '0';
 	signal s01_axis_tvalid	: std_logic := '0';
 
@@ -163,7 +160,6 @@ architecture tb of tb_loopback is
 	signal m01_axis_aresetn	: std_logic := '0';
 	signal m01_axis_tvalid	: std_logic := '0';
 	signal m01_axis_tdata	  : std_logic_vector(C_M00_AXIS_TDATA_WIDTH-1 downto 0) := (others => '0');
-	signal m01_axis_tstrb	  : std_logic_vector((C_M00_AXIS_TDATA_WIDTH/8)-1 downto 0) := (others => '0');
 	signal m01_axis_tlast	  : std_logic := '0';
 	signal m01_axis_tready	: std_logic := '0';
   
@@ -278,7 +274,6 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
 		s00_axis_aresetn	=> s00_axis_aresetn,
 		s00_axis_tready	  => s00_axis_tready	,
 		s00_axis_tdata	  => s00_axis_tdata	,
-		s00_axis_tstrb	  => s00_axis_tstrb	,
 		s00_axis_tlast	  => s00_axis_tlast	,
 		s00_axis_tvalid	  => s00_axis_tvalid	,
 
@@ -287,7 +282,6 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
 		m00_axis_aresetn	=> m00_axis_aresetn,
 		m00_axis_tvalid	  => m00_axis_tvalid	,
 		m00_axis_tdata	  => m00_axis_tdata	,
-		m00_axis_tstrb	  => m00_axis_tstrb	,
 		m00_axis_tlast	  => m00_axis_tlast	,
 		m00_axis_tready	  => m00_axis_tready,
     
@@ -296,7 +290,6 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
 		s01_axis_aresetn	=> s01_axis_aresetn,
 		s01_axis_tready	  => s01_axis_tready	,
 		s01_axis_tdata	  => s01_axis_tdata	,
-		s01_axis_tstrb	  => s01_axis_tstrb	,
 		s01_axis_tlast	  => s01_axis_tlast	,
 		s01_axis_tvalid	  => s01_axis_tvalid	,
 
@@ -305,7 +298,6 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
 		m01_axis_aresetn	=> m01_axis_aresetn,
 		m01_axis_tvalid	  => m01_axis_tvalid	,
 		m01_axis_tdata	  => m01_axis_tdata	,
-		m01_axis_tstrb	  => m01_axis_tstrb	,
 		m01_axis_tlast	  => m01_axis_tlast	,
 		m01_axis_tready	  => m01_axis_tready	
 	);
@@ -428,21 +420,39 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     wait for T_RST;
     aresetn <= '1';
     
+    -- Ready for receive data
+    m00_axis_tready <= '1';
+    m01_axis_tready <= '1';
+    
+    -- Transmit and receive locks achieved
+    trx0_rxlock_i <= '1';
+    trx0_txlock_i <= '1';
+    trx1_rxlock_i <= '1';
+    trx1_txlock_i <= '1';
+    
     -- Send data 10 times
-    for cycle in 0 to 20 loop
+    for cycle in 0 to 5 loop
       s00_axis_tvalid  <= '1';
       s01_axis_tvalid  <= '1';
       -- Send 4 bytes on both transmitters
       s00_axis_tdata <= x"98FEDCBA";
       s01_axis_tdata <= x"87654321";
       wait for CLOCK_PERIOD;
-      -- Send sync (valid signal LOW)
-      s00_axis_tdata <= (others => '0'); -- Zeroing data is not actually necessary
-      s01_axis_tdata <= (others => '0'); -- but it looks nicer in simulation
-      s00_axis_tvalid  <= '0';
-      s01_axis_tvalid  <= '0';
+      -- Send 4 bytes on both transmitters
+      s00_axis_tdata <= x"98FEDCBA";
+      s01_axis_tdata <= x"87654321";
       wait for CLOCK_PERIOD;
+      for sync in 0 to 10 loop
+          -- Send sync (valid signal LOW)
+          s00_axis_tdata <= (others => '0'); -- Zeroing data is not actually necessary
+          s01_axis_tdata <= (others => '0'); -- but it looks nicer in simulation
+          s00_axis_tvalid  <= '0';
+          s01_axis_tvalid  <= '0';
+          wait for CLOCK_PERIOD;
+      end loop;
     end loop;
+    
+    wait for CLOCK_PERIOD*50;
     
     s00_axis_tvalid <= '0';
     s01_axis_tvalid <= '0';

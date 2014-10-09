@@ -17,6 +17,34 @@ entity axi_serdes_fmc_v1_0_S00_AXI is
 	);
 	port (
 		-- Users to add ports here
+    -- Transceiver 0
+    -- Transmitter control
+    trx0_txrst_o        : out std_logic;
+    trx0_txdcbal_o      : out std_logic;
+    trx0_txlock_i       : in std_logic;
+    -- IODELAY control signals
+    trx0_iodelay_inc_o  : out std_logic;
+    trx0_iodelay_dec_o  : out std_logic;
+    -- Receiver control
+    trx0_rxrst_o        : out std_logic;
+    trx0_rxdcbal_o      : out std_logic;
+    trx0_rxlock_i       : in std_logic;
+    -- Internal loopback control
+    trx0_loopback_o     : out std_logic;
+    -- Transceiver 1
+    -- Transmitter control
+    trx1_txrst_o        : out std_logic;
+    trx1_txdcbal_o      : out std_logic;
+    trx1_txlock_i       : in std_logic;
+    -- IODELAY control signals
+    trx1_iodelay_inc_o  : out std_logic;
+    trx1_iodelay_dec_o  : out std_logic;
+    -- Receiver control
+    trx1_rxrst_o        : out std_logic;
+    trx1_rxdcbal_o      : out std_logic;
+    trx1_rxlock_i       : in std_logic;
+    -- Internal loopback control
+    trx1_loopback_o     : out std_logic;
     
 		-- User ports ends
 		-- Do not modify the ports beyond this line
@@ -118,6 +146,16 @@ architecture arch_imp of axi_serdes_fmc_v1_0_S00_AXI is
 	signal reg_data_out	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
 	signal byte_index	: integer;
 
+	signal slv_reg0_read	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+	signal slv_reg1_read	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+	signal slv_reg2_read	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+	signal slv_reg3_read	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+
+	signal slv_reg0_def	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+	signal slv_reg1_def	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+	signal slv_reg2_def	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+	signal slv_reg3_def	:std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+  
 begin
 	-- I/O Connections assignments
 
@@ -209,10 +247,10 @@ begin
 	begin
 	  if rising_edge(S_AXI_ACLK) then 
 	    if S_AXI_ARESETN = '0' then
-	      slv_reg0 <= (others => '0');
-	      slv_reg1 <= (others => '0');
-	      slv_reg2 <= (others => '0');
-	      slv_reg3 <= (others => '0');
+	      slv_reg0 <= slv_reg0_def;
+	      slv_reg1 <= slv_reg1_def;
+	      slv_reg2 <= slv_reg2_def;
+	      slv_reg3 <= slv_reg3_def;
 	    else
 	      loc_addr := axi_awaddr(ADDR_LSB + OPT_MEM_ADDR_BITS downto ADDR_LSB);
 	      if (slv_reg_wren = '1') then
@@ -341,7 +379,7 @@ begin
 	-- and the slave is ready to accept the read address.
 	slv_reg_rden <= axi_arready and S_AXI_ARVALID and (not axi_rvalid) ;
 
-	process (slv_reg0, slv_reg1, slv_reg2, slv_reg3, axi_araddr, S_AXI_ARESETN, slv_reg_rden)
+	process (slv_reg0_read, slv_reg1_read, slv_reg2_read, slv_reg3_read, axi_araddr, S_AXI_ARESETN, slv_reg_rden)
 	variable loc_addr :std_logic_vector(OPT_MEM_ADDR_BITS downto 0);
 	begin
 	  if S_AXI_ARESETN = '0' then
@@ -351,13 +389,13 @@ begin
 	    loc_addr := axi_araddr(ADDR_LSB + OPT_MEM_ADDR_BITS downto ADDR_LSB);
 	    case loc_addr is
 	      when b"00" =>
-	        reg_data_out <= slv_reg0;
+	        reg_data_out <= slv_reg0_read;
 	      when b"01" =>
-	        reg_data_out <= slv_reg1;
+	        reg_data_out <= slv_reg1_read;
 	      when b"10" =>
-	        reg_data_out <= slv_reg2;
+	        reg_data_out <= slv_reg2_read;
 	      when b"11" =>
-	        reg_data_out <= slv_reg3;
+	        reg_data_out <= slv_reg3_read;
 	      when others =>
 	        reg_data_out  <= (others => '0');
 	    end case;
@@ -384,7 +422,63 @@ begin
 
 
 	-- Add user logic here
+  
+  -- Defaults
+  process( S_AXI_ACLK ) is
+  begin
+    slv_reg0_def <= (others => '0');
+    slv_reg0_def(0)  <= '1';    -- trx0_txrst_o      
+    slv_reg0_def(1)  <= '0';    -- trx0_txdcbal_o    
+    slv_reg0_def(16) <= '1';    -- trx0_rxrst_o      
+    slv_reg0_def(17) <= '0';    -- trx0_rxdcbal_o    
+    slv_reg0_def(18) <= '0';    -- trx0_loopback_o    
+    slv_reg0_def(20) <= '0';    -- trx0_iodelay_inc_o
+    slv_reg0_def(21) <= '0';    -- trx0_iodelay_dec_o
+  end process;
+  process( S_AXI_ACLK ) is
+  begin
+    slv_reg1_def <= (others => '0');
+    slv_reg1_def(0)  <= '1';    -- trx1_txrst_o      
+    slv_reg1_def(1)  <= '0';    -- trx1_txdcbal_o    
+    slv_reg1_def(16) <= '1';    -- trx1_rxrst_o      
+    slv_reg1_def(17) <= '0';    -- trx1_rxdcbal_o    
+    slv_reg1_def(18) <= '0';    -- trx1_loopback_o    
+    slv_reg1_def(20) <= '0';    -- trx1_iodelay_inc_o
+    slv_reg1_def(21) <= '0';    -- trx1_iodelay_dec_o
+  end process;
+  
+  -- Output assignments
+  trx0_txrst_o        <= slv_reg0(0);
+  trx0_txdcbal_o      <= slv_reg0(1);
+  trx0_rxrst_o        <= slv_reg0(16);
+  trx0_rxdcbal_o      <= slv_reg0(17);
+  trx0_loopback_o     <= slv_reg0(18);
+  trx0_iodelay_inc_o  <= slv_reg0(20);
+  trx0_iodelay_dec_o  <= slv_reg0(21);
+  trx1_txrst_o        <= slv_reg1(0);
+  trx1_txdcbal_o      <= slv_reg1(1);
+  trx1_rxrst_o        <= slv_reg1(16);
+  trx1_rxdcbal_o      <= slv_reg1(17);
+  trx1_loopback_o     <= slv_reg1(18);
+  trx1_iodelay_inc_o  <= slv_reg1(20);
+  trx1_iodelay_dec_o  <= slv_reg1(21);
 
+  -- Input assignments
+  -- Slave register 0
+  process(trx0_txlock_i,trx0_rxlock_i,slv_reg0) is
+  begin
+    slv_reg0_read <= slv_reg0;
+    slv_reg0_read(8)  <= trx0_txlock_i;
+    slv_reg0_read(24) <= trx0_rxlock_i;
+  end process;
+  -- Slave register 1
+  process(trx1_txlock_i,trx1_rxlock_i,slv_reg1) is
+  begin
+    slv_reg1_read <= slv_reg1;
+    slv_reg1_read(8)  <= trx1_txlock_i;
+    slv_reg1_read(24) <= trx1_rxlock_i;
+  end process;
+  
 	-- User logic ends
 
 end arch_imp;

@@ -9,9 +9,10 @@ library unisim;
 
 entity clk_buf is
 port (
-  -- Input clock
-  clk_p_i        : in  std_logic;
-  clk_n_i        : in  std_logic;
+  -- Input clocks
+  clk_p_i        : in std_logic;
+  clk_n_i        : in std_logic;
+  clk_user_i     : in std_logic;
   -- Output clocks
   clk_bufg_div_o : out std_logic;
   clk_bufr_o     : out std_logic
@@ -59,7 +60,7 @@ begin
   port map (
     CE  => '1',
     CLR => '0',
-    I   => clk_ibufds,
+    I   => clk_user_i,
     O   => clk_bufr_div
   );
   
