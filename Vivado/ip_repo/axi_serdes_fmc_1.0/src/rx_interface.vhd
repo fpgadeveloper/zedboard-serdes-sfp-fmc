@@ -136,12 +136,13 @@ begin
     -- DDR
     --------------------------------------------------------------------
     -- The deserializer presents the lower significant nibble (LSN) before
-    -- the high significant nibble (HSN). The LSN must be clocked into
-    -- the FPGA on the FALLING edge of the clock and the HSN on the rising.
-    -- However, the IDDR primitive outputs the first data on the rising edge,
-    -- therefore we need to negate the clock at the input (C).
-    -- First clock cycle (rising edge) receives the lower 5-bit nibble.
-    -- Second clock cycle (falling edge) receives the higher 5-bit nibble.
+    -- the high significant nibble (HSN) according to the datasheet. 
+    -- The LSN must be clocked into the FPGA on the FALLING edge of the
+    -- clock and the HSN on the rising, also according to the datasheet.
+    -- However that is contrary to the TI application note AN-1887 which
+    -- shows timing diagrams that indicate that the LSN is clocked by a
+    -- rising edge and the HSN by the falling. Our tests have shown that
+    -- the application note's method is the correct one.
     --------------------------------------------------------------------
     iddr_inst : IDDR
     generic map (
@@ -150,7 +151,7 @@ begin
     port map (
       Q1 => rxdata_sdr(i),    -- Rising edge: Low nibble
       Q2 => rxdata_sdr(i+5),  -- Falling edge: High nibble
-      C  => rxclk_bufr,  -- Clock is negated
+      C  => rxclk_bufr,
       CE => '1',
       D  => rxdata_delay(i),
       R  => '0',
