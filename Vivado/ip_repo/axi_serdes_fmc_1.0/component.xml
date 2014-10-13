@@ -656,7 +656,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>2922a40c</spirit:value>
+            <spirit:value>35fa7a34</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -672,7 +672,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>2922a40c</spirit:value>
+            <spirit:value>35fa7a34</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2063,7 +2063,7 @@
       <spirit:file>
         <spirit:name>hdl/axi_serdes_fmc_v1_0.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_6fe929c1</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_553c7859</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -2319,8 +2319,8 @@
         <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
       </xilinx:taxonomies>
       <xilinx:displayName>axi_serdes_fmc_v1.0</xilinx:displayName>
-      <xilinx:coreRevision>33</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2014-10-09T01:52:07Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>42</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2014-10-11T23:57:11Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="xilinx.com:user:axi_serdes_fmc:1.0_ARCHIVE_LOCATION">E:/Github/fpgadeveloper/zedboard-serdes-sfp-fmc/Vivado/ip_repo/axi_serdes_fmc_1.0</xilinx:tag>
         <xilinx:tag xilinx:name="opsero.com:user:axi_serdes_fmc:1.0_ARCHIVE_LOCATION">E:/Github/fpgadeveloper/zedboard-serdes-sfp-fmc/Vivado/ip_repo/axi_serdes_fmc_1.0</xilinx:tag>
@@ -2330,7 +2330,7 @@
       <xilinx:xilinxVersion>2014.2</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="0d6b1414"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="cafe3ba6"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="e7c87b17"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="323b736d"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="fe14a8f8"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="0d748eb3"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="871c7222"/>

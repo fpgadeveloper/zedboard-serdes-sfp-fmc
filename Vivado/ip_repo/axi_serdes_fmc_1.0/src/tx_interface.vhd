@@ -1,9 +1,7 @@
 ----------------------------------------------------------------------------------------------------
 library ieee;
   use ieee.std_logic_1164.all;
-  use ieee.std_logic_arith.all;
-  use ieee.std_logic_misc.all;
-  use ieee.std_logic_unsigned.all;
+  use ieee.numeric_std.all;
 library unisim;
   use unisim.vcomponents.all;
 
@@ -13,7 +11,9 @@ port (
   -- Input ports
   txclk_i        : in std_logic;
   txdata_i       : in std_logic_vector(9 downto 0);
+  txlock_i       : in std_logic;
   -- Output pins
+  txready_o      : out std_logic;
   txdata_p_o     : out std_logic_vector(4 downto 0);
   txdata_n_o     : out std_logic_vector(4 downto 0);
   txclk_p_o      : out std_logic;
@@ -27,7 +27,10 @@ signal txdata_r0     : std_logic_vector(9 downto 0);
 signal txdata_r1     : std_logic_vector(9 downto 0);
 signal txdata_r2     : std_logic_vector(9 downto 0);
 signal txclk_ddr     : std_logic;
+signal txdata_ddr_in : std_logic_vector(9 downto 0);
 signal txdata_ddr    : std_logic_vector(4 downto 0);
+signal txready       : std_logic;
+signal counter       : std_logic_vector(7 downto 0);
 
 begin
 
@@ -35,11 +38,23 @@ begin
   process (txclk_i)
 	begin
     if rising_edge(txclk_i) then 
-      txdata_r0 <= txdata_i;
-      txdata_r1 <= txdata_r0;
-      txdata_r2 <= txdata_r1;
+      -- When we lose lock, reset the buffers
+      if (txlock_i = '1') then
+        txdata_r0 <= (others => '1');
+        txdata_r1 <= (others => '1');
+        txdata_r2 <= (others => '1');
+      elsif (txready = '1') then
+        txdata_r0 <= (others => '1');
+        txdata_r1 <= txdata_r0;
+        txdata_r2 <= txdata_r1;
+      else
+        txdata_r0 <= txdata_i;
+        txdata_r1 <= txdata_r0;
+        txdata_r2 <= txdata_r1;
+      end if;
     end if;
 	end process;
+  
   
   ----------------------------------------------------------------------------------------------------
   -- Forwarded transmit clock
@@ -61,8 +76,8 @@ begin
     Q => txclk_ddr,
     C => txclk_i,
     CE => '1',
-    D1 => '0', -- Rising edge, low nibble, low clock
-    D2 => '1', -- Falling edge, high nibble, high clock
+    D1 => '1', -- Rising edge, low nibble, low clock
+    D2 => '0', -- Falling edge, high nibble, high clock
     R => '0',
     S => '0'
   );
@@ -112,5 +127,27 @@ begin
     );
 
   end generate;
+  
+  -- Counter for transmitting 110 SYNC characters
+  process (txclk_i)
+  begin
+    if (rising_edge(txclk_i)) then
+      -- When we lose lock, reset the counter
+      if (txlock_i = '1') then
+        counter <= (others => '0');
+        txready <= '1';  -- Send SYNC characters for 120 clock cycles
+      -- While counter has not yet reached timeout, increment
+      elsif (counter /= std_logic_vector(to_unsigned(120,8))) then
+        counter <= std_logic_vector(unsigned(counter) + 1);
+        txready <= '1';  -- Send SYNC characters for 120 clock cycles
+      -- After timeout, stop sending SYNC and assert TXREADY
+      else
+        txready <= '0';
+      end if;
+    end if;
+  end process;
+  
+  -- Output assignments
+  txready_o <= txready;
   
 end tx_interface_syn;

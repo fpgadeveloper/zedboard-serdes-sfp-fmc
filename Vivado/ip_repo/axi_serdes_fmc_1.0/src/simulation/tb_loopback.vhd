@@ -412,6 +412,10 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     variable bytenum : unsigned(7 downto 0);  -- byte number
   begin
     aresetn <= '0';
+    trx0_rxlock_i <= '1';
+    trx0_txlock_i <= '1';
+    trx1_rxlock_i <= '1';
+    trx1_txlock_i <= '1';
 
     -- Drive inputs T_HOLD time after rising edge of clock
     wait until rising_edge(aclk_x);
@@ -420,15 +424,17 @@ axi_serdes_fmc_v1_0_inst : entity work.axi_serdes_fmc_v1_0
     wait for T_RST;
     aresetn <= '1';
     
+    wait for CLOCK_PERIOD*3;
+    
     -- Ready for receive data
     m00_axis_tready <= '1';
     m01_axis_tready <= '1';
     
     -- Transmit and receive locks achieved
-    trx0_rxlock_i <= '1';
-    trx0_txlock_i <= '1';
-    trx1_rxlock_i <= '1';
-    trx1_txlock_i <= '1';
+    trx0_rxlock_i <= '0';
+    trx0_txlock_i <= '0';
+    trx1_rxlock_i <= '0';
+    trx1_txlock_i <= '0';
     
     -- Send data 10 times
     for cycle in 0 to 5 loop

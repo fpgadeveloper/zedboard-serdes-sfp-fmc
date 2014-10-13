@@ -1,9 +1,7 @@
 ----------------------------------------------------------------------------------------------------
 library ieee;
   use ieee.std_logic_1164.all;
-  use ieee.std_logic_arith.all;
-  use ieee.std_logic_misc.all;
-  use ieee.std_logic_unsigned.all;
+  use ieee.numeric_std.all;
 library unisim;
   use unisim.vcomponents.all;
 
@@ -27,6 +25,7 @@ port (
   rxdata_n_i     : in std_logic_vector(4 downto 0);
   rxclk_p_i      : in std_logic;
   rxclk_n_i      : in std_logic;
+  rxlock_i       : in std_logic;
   -- Output ports
   rxclk_o        : out std_logic;
   rxdata_o       : out std_logic_vector(9 downto 0)
@@ -130,7 +129,7 @@ begin
       LDPIPEEN => '0',
       DATAIN => '0',
       REGRST => rst_i,
-      CNTVALUEIN => conv_std_logic_vector(RXDATA_IDELAY(i), 5),
+      CNTVALUEIN => std_logic_vector(to_unsigned(RXDATA_IDELAY(i), 5)),
       CINVCTRL => '0'
     );
 
@@ -151,7 +150,7 @@ begin
     port map (
       Q1 => rxdata_sdr(i),    -- Rising edge: Low nibble
       Q2 => rxdata_sdr(i+5),  -- Falling edge: High nibble
-      C  => not rxclk_bufr,  -- Clock is negated
+      C  => rxclk_bufr,  -- Clock is negated
       CE => '1',
       D  => rxdata_delay(i),
       R  => '0',
@@ -163,10 +162,17 @@ begin
   -- Pipelining the data to pass timing
   process (rxclk_bufr)
 	begin
-    if rising_edge(rxclk_bufr) then 
-      rxdata_sdr_r0 <= rxdata_sdr;
-      rxdata_sdr_r1 <= rxdata_sdr_r0;
-      rxdata_sdr_r2 <= rxdata_sdr_r1;
+    if rising_edge(rxclk_bufr) then
+      -- When we lose lock, reset the buffers
+      if (rxlock_i = '1') then
+        rxdata_sdr_r0 <= (others => '1');
+        rxdata_sdr_r1 <= (others => '1');
+        rxdata_sdr_r2 <= (others => '1');
+      else
+        rxdata_sdr_r0 <= rxdata_sdr;
+        rxdata_sdr_r1 <= rxdata_sdr_r0;
+        rxdata_sdr_r2 <= rxdata_sdr_r1;
+      end if;
     end if;
 	end process;
 	

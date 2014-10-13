@@ -73,7 +73,7 @@ begin
   ------------------------------------------------------------------
 
   -- Invert the AXI reset signal
-  rst <= not M_AXIS_ARESETN;
+  rst <= (not M_AXIS_ARESETN) or rxlock_i;
 
   -- FIFO write enable:
   -- rxdata_i 5th and 10th bits are VALID_N signals from deserializer

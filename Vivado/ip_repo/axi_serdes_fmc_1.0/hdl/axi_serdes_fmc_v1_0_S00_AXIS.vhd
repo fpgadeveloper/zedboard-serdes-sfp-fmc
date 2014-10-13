@@ -17,7 +17,7 @@ entity axi_serdes_fmc_v1_0_S00_AXIS is
 		-- Users to add ports here
     txclk_i        : in std_logic;
     txdata_o       : out std_logic_vector(9 downto 0);
-    txlock_i       : in std_logic;
+    txready_i      : in std_logic;
 
 		-- User ports ends
 		-- Do not modify the ports beyond this line
@@ -64,8 +64,8 @@ begin
   -- Invert the AXI reset signal
   rst <= not S_AXIS_ARESETN;
   
-  -- Allow reads when transmit lock is achieved
-  rd_en <= not txlock_i;
+  -- Allow reads when transmit ready is achieved
+  rd_en <= not txready_i;
   
   fifo_32bit_to_8bit_inst : fifo_32bit_to_8bit
   port map (

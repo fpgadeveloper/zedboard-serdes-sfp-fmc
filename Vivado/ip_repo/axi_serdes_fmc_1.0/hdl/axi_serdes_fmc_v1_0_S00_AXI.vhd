@@ -22,6 +22,7 @@ entity axi_serdes_fmc_v1_0_S00_AXI is
     trx0_txrst_o        : out std_logic;
     trx0_txdcbal_o      : out std_logic;
     trx0_txlock_i       : in std_logic;
+    trx0_txready_i      : in std_logic;
     -- IODELAY control signals
     trx0_iodelay_inc_o  : out std_logic;
     trx0_iodelay_dec_o  : out std_logic;
@@ -36,6 +37,7 @@ entity axi_serdes_fmc_v1_0_S00_AXI is
     trx1_txrst_o        : out std_logic;
     trx1_txdcbal_o      : out std_logic;
     trx1_txlock_i       : in std_logic;
+    trx1_txready_i      : in std_logic;
     -- IODELAY control signals
     trx1_iodelay_inc_o  : out std_logic;
     trx1_iodelay_dec_o  : out std_logic;
@@ -465,17 +467,19 @@ begin
 
   -- Input assignments
   -- Slave register 0
-  process(trx0_txlock_i,trx0_rxlock_i,slv_reg0) is
+  process(trx0_txlock_i,trx0_rxlock_i,trx0_txready_i,slv_reg0) is
   begin
     slv_reg0_read <= slv_reg0;
     slv_reg0_read(8)  <= trx0_txlock_i;
+    slv_reg0_read(9)  <= trx0_txready_i;
     slv_reg0_read(24) <= trx0_rxlock_i;
   end process;
   -- Slave register 1
-  process(trx1_txlock_i,trx1_rxlock_i,slv_reg1) is
+  process(trx1_txlock_i,trx1_rxlock_i,trx1_txready_i,slv_reg1) is
   begin
     slv_reg1_read <= slv_reg1;
     slv_reg1_read(8)  <= trx1_txlock_i;
+    slv_reg1_read(9)  <= trx1_txready_i;
     slv_reg1_read(24) <= trx1_rxlock_i;
   end process;
   

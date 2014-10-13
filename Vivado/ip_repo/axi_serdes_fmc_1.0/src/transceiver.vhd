@@ -42,6 +42,7 @@ port (
     txdcbal_o      : out std_logic;
     txlock_i       : in std_logic;
     txlock_o       : out std_logic;
+    txready_o      : out std_logic;
     -- Receiver interface
     iodelay_inc_i  : in std_logic;
     iodelay_dec_i  : in std_logic;
@@ -81,7 +82,9 @@ architecture transceiver_syn of transceiver is
     -- Input ports
     txclk_i        : in std_logic;
     txdata_i       : in std_logic_vector(9 downto 0);
+    txlock_i       : in std_logic;
     -- Output pins
+    txready_o      : out std_logic;
     txdata_p_o     : out std_logic_vector(4 downto 0);
     txdata_n_o     : out std_logic_vector(4 downto 0);
     txclk_p_o      : out std_logic;
@@ -109,12 +112,16 @@ architecture transceiver_syn of transceiver is
     rxdata_n_i     : in std_logic_vector(4 downto 0);
     rxclk_p_i      : in std_logic;
     rxclk_n_i      : in std_logic;
+    rxlock_i       : in std_logic;
     -- Output ports
     rxclk_o        : out std_logic;
     rxdata_o       : out std_logic_vector(9 downto 0)
   );
   end component;
 
+  signal txlock : std_logic;
+  signal rxlock : std_logic;
+  
 begin
 
   ----------------------------------------------------------------------------------------------------
@@ -137,6 +144,8 @@ begin
     rst_i      => rst_i,
     txclk_i    => txclk_i,
     txdata_i   => txdata_i,
+    txlock_i   => txlock,
+    txready_o  => txready_o,
     txdata_p_o => txdata_p_o,
     txdata_n_o => txdata_n_o,
     txclk_p_o  => txclk_p_o,
@@ -171,7 +180,7 @@ begin
     IBUF_LOW_PWR => TRUE,
     IOSTANDARD => "LVCMOS25")
   port map (
-    O => txlock_o,
+    O => txlock,
     I => txlock_i
   );
 
@@ -196,6 +205,7 @@ begin
     rxdata_n_i     => rxdata_n_i,
     rxclk_p_i      => rxclk_p_i,
     rxclk_n_i      => rxclk_n_i,
+    rxlock_i       => rxlock,
     rxclk_o        => rxclk_o,
     rxdata_o       => rxdata_o
   );
@@ -228,7 +238,7 @@ begin
     IBUF_LOW_PWR => TRUE,
     IOSTANDARD => "LVCMOS25")
   port map (
-    O => rxlock_o,
+    O => rxlock,
     I => rxlock_i
   );
 
@@ -241,5 +251,8 @@ begin
     REFCLK => clk_200mhz_i,
     RST => rst_i
   );
+  
+  txlock_o <= txlock;
+  rxlock_o <= rxlock;
   
 end transceiver_syn;
