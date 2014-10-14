@@ -15,14 +15,14 @@ port (
   clk_user_i     : in std_logic;
   -- Output clocks
   clk_bufg_div_o : out std_logic;
-  clk_bufr_o     : out std_logic
+  clk_bufg_o     : out std_logic
 );
 end clk_buf;
 
 architecture clk_buf_syn of clk_buf is
 
 signal clk_ibufds   : std_logic;
-signal clk_bufr     : std_logic;
+signal clk_bufg     : std_logic;
 signal clk_bufr_div : std_logic;
 signal clk_bufg_div : std_logic;
 
@@ -40,16 +40,11 @@ begin
     O  => clk_ibufds
   );
 
-  -- Regional clock buffer
-  bufr_inst : BUFR
-  generic map (
-    BUFR_DIVIDE => "BYPASS"
-  )
+  -- Global clock buffer
+  bufr_inst : BUFG
   port map (
-    CE  => '1',
-    CLR => '0',
     I   => clk_ibufds,
-    O   => clk_bufr
+    O   => clk_bufg
   );
   
   -- Regional clock buffer divided by 4
@@ -75,6 +70,6 @@ begin
 -- Connect outputs
 ----------------------------------------------------------------------------------------------------
 clk_bufg_div_o <= clk_bufg_div;
-clk_bufr_o <= clk_bufr;
+clk_bufg_o <= clk_bufg;
 
 end clk_buf_syn;

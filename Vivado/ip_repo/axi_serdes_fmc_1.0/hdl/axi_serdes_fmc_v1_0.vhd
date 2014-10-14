@@ -46,7 +46,7 @@ entity axi_serdes_fmc_v1_0 is
     trx0_clk_n_i        : in  std_logic;
     -- Output clocks
     trx0_clk_bufg_div_o : out std_logic;
-    trx0_clk_bufr_o     : out std_logic;
+    trx0_clk_bufg_o     : out std_logic;
     -- Input clock from user design
     trx0_clk_i          : in std_logic;
     -- Transmitter interface
@@ -76,7 +76,7 @@ entity axi_serdes_fmc_v1_0 is
     trx1_clk_n_i        : in  std_logic;
     -- Output clocks
     trx1_clk_bufg_div_o : out std_logic;
-    trx1_clk_bufr_o     : out std_logic;
+    trx1_clk_bufg_o     : out std_logic;
     -- Input clock from user design
     trx1_clk_i          : in std_logic;
     -- Transmitter interface
@@ -278,7 +278,7 @@ architecture arch_imp of axi_serdes_fmc_v1_0 is
       clk_n_i        : in  std_logic;
       -- Output clocks
       clk_bufg_div_o : out std_logic;
-      clk_bufr_o     : out std_logic;
+      clk_bufg_o     : out std_logic;
       -- Input clock from user design
       clk_user_i     : in std_logic;
       -- Transmitter interface
@@ -568,7 +568,7 @@ loopback_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     clk_n_i        => trx0_clk_n_i,
     -- Output clocks
     clk_bufg_div_o => trx0_clk_bufg_div_o,
-    clk_bufr_o     => trx0_clk_bufr_o,
+    clk_bufg_o     => trx0_clk_bufg_o,
     -- Input clock from user design
     clk_user_i     => trx0_clk_i,
     -- Transmitter interface
@@ -623,7 +623,7 @@ loopback_M01_AXIS_inst : axi_serdes_fmc_v1_0_M00_AXIS
     clk_n_i        => trx1_clk_n_i,
     -- Output clocks
     clk_bufg_div_o => trx1_clk_bufg_div_o,
-    clk_bufr_o     => trx1_clk_bufr_o,
+    clk_bufg_o     => trx1_clk_bufg_o,
     -- Input clock from user design
     clk_user_i     => trx1_clk_i,
     -- Transmitter interface
