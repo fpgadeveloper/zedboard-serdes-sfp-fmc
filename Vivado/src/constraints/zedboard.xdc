@@ -129,10 +129,10 @@ set_property IODELAY_GROUP trx1_iodelay_grp [get_cells {design_1_i/axi_serdes_fm
 set_property IODELAY_GROUP trx1_iodelay_grp [get_cells {design_1_i/axi_serdes_fmc_0/U0/transceiver1_inst/rx_interface_inst/data[4].idelay_inst}]
 
 
-create_clock -period 3.200 -name trx0_clk_p_i -waveform {0.000 1.600} [get_ports trx0_clk_p_i]
-create_clock -period 3.200 -name trx0_rxclk_p_i -waveform {0.000 1.600} [get_ports trx0_rxclk_p_i]
-create_clock -period 3.200 -name trx1_clk_p_i -waveform {0.000 1.600} [get_ports trx1_clk_p_i]
-create_clock -period 3.200 -name trx1_rxclk_p_i -waveform {0.000 1.600} [get_ports trx1_rxclk_p_i]
+create_clock -period 4.000 -name trx0_clk_p_i -waveform {0.000 2.000} [get_ports trx0_clk_p_i]
+create_clock -period 4.000 -name trx0_rxclk_p_i -waveform {0.000 2.000} [get_ports trx0_rxclk_p_i]
+create_clock -period 4.000 -name trx1_clk_p_i -waveform {0.000 2.000} [get_ports trx1_clk_p_i]
+create_clock -period 4.000 -name trx1_rxclk_p_i -waveform {0.000 2.000} [get_ports trx1_rxclk_p_i]
 create_generated_clock -name trx0_txclk_p_o -source [get_pins design_1_i/axi_serdes_fmc_0/U0/transceiver0_inst/tx_interface_inst/clk_oddr_inst/C] -divide_by 1 -invert [get_ports trx0_txclk_p_o]
 create_generated_clock -name trx1_txclk_p_o -source [get_pins design_1_i/axi_serdes_fmc_0/U0/transceiver1_inst/tx_interface_inst/clk_oddr_inst/C] -divide_by 1 -invert [get_ports trx1_txclk_p_o]
 

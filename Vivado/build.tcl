@@ -3,8 +3,11 @@
 #
 #*****************************************************************************************
 
-# Set the reference directory to where the script is
-set origin_dir [file dirname [info script]]
+# Set the reference directory for source file relative paths (by default the value is script directory path)
+set origin_dir "."
+
+# Set the directory path for the original project from where this script was exported
+set orig_proj_dir "[file normalize "$origin_dir/zedboard_serdes_sfp_fmc"]"
 
 # Create project
 create_project zedboard_serdes_sfp_fmc $origin_dir/zedboard_serdes_sfp_fmc

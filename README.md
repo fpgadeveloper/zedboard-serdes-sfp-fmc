@@ -23,7 +23,7 @@ which you can easily find on Amazon.com.
 
 Alternatively, you can buy an SFP loopback cable.
 
-* Vivado 2014.2
+* Vivado 2014.4
 * ZedBoard (http://www.zedboard.org)
 * SERDES SFP FMC
 * 1x SFP loopback cable or 2x SFP modules with fiber patch cable
