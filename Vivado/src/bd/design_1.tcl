@@ -1,7 +1,7 @@
 ################################################################
 # Check if script is running in correct Vivado version.
 ################################################################
-set scripts_vivado_version 2014.4
+set scripts_vivado_version 2015.3
 set current_vivado_version [version -short]
 
 if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
@@ -229,9 +229,19 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/processing_sy
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Slave "/processing_system7_0/S_AXI_HP0" Clk "Auto" }  [get_bd_intf_pins axi_dma_1/M_AXI_S2MM]
 endgroup
 
-# Now disconnect FCLK0 and replace it with axi_serdes_fmc_0/trx0_clk_bufg_div_o
+# Now disconnect FCLK0 and replace it with axi_serdes_fmc_0/trx0_clk_bufg_div_o through a clock wizard
 disconnect_bd_net /processing_system7_0_FCLK_CLK0 [get_bd_pins processing_system7_0/FCLK_CLK0]
-connect_bd_net -net [get_bd_nets processing_system7_0_FCLK_CLK0] [get_bd_pins axi_serdes_fmc_0/trx0_clk_bufg_div_o]
+startgroup
+create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:5.2 clk_wiz_0
+endgroup
+connect_bd_net [get_bd_pins axi_serdes_fmc_0/trx0_clk_bufg_div_o] [get_bd_pins clk_wiz_0/clk_in1]
+connect_bd_net [get_bd_pins clk_wiz_0/clk_out1] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK]
+startgroup
+set_property -dict [list CONFIG.PRIMITIVE {MMCM} CONFIG.RESET_TYPE {ACTIVE_LOW} CONFIG.CLKOUT1_DRIVES {BUFG} CONFIG.CLKOUT2_DRIVES {BUFG} CONFIG.CLKOUT3_DRIVES {BUFG} CONFIG.CLKOUT4_DRIVES {BUFG} CONFIG.CLKOUT5_DRIVES {BUFG} CONFIG.CLKOUT6_DRIVES {BUFG} CONFIG.CLKOUT7_DRIVES {BUFG} CONFIG.FEEDBACK_SOURCE {FDBK_AUTO} CONFIG.MMCM_DIVCLK_DIVIDE {1} CONFIG.MMCM_CLKFBOUT_MULT_F {10.000} CONFIG.MMCM_COMPENSATION {ZHOLD} CONFIG.MMCM_CLKOUT0_DIVIDE_F {10.000} CONFIG.RESET_PORT {resetn} CONFIG.CLKOUT1_JITTER {130.958} CONFIG.CLKOUT1_PHASE_ERROR {98.575}] [get_bd_cells clk_wiz_0]
+endgroup
+delete_bd_objs [get_bd_nets processing_system7_0_FCLK_RESET0_N]
+connect_bd_net [get_bd_pins rst_processing_system7_0_250M/ext_reset_in] [get_bd_pins clk_wiz_0/locked]
+connect_bd_net [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins clk_wiz_0/resetn]
 
 # Connect the FCLK_CLK0 to the AXI SERDES clock inputs
 connect_bd_net [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins axi_serdes_fmc_0/trx0_clk_i]

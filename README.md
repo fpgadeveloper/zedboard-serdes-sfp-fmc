@@ -3,6 +3,12 @@ zedboard-serdes-sfp-fmc
 
 Example design for the SERDES SFP FMC on the ZedBoard
 
+### No Longer Maintained
+
+Due to a lack of demand for the SERDES SFP FMC, this project is no longer being
+maintained and supported. The Vivado project has been updated to version 2015.3
+and no longer passes timing. The SDK application is still version 2014.4.
+
 ### Description
 
 This project demonstrates the Opsero SERDES SFP FMC (FPGA Mezzanine Card).
@@ -23,7 +29,7 @@ which you can easily find on Amazon.com.
 
 Alternatively, you can buy an SFP loopback cable.
 
-* Vivado 2014.4
+* Vivado 2015.3
 * ZedBoard (http://www.zedboard.org)
 * SERDES SFP FMC
 * 1x SFP loopback cable or 2x SFP modules with fiber patch cable
